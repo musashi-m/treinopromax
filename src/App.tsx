@@ -136,6 +136,8 @@ export const App: React.FC = () => {
     }
   };
 
+  const currentUserIdOrEmail = currentUser?.id || currentUser?.email || '';
+
   useEffect(() => {
     async function checkSupabaseSession() {
       try {
@@ -155,8 +157,11 @@ export const App: React.FC = () => {
         if (data.session?.user) {
           const email = data.session.user.email || 'vini@gmail.com';
           const userObj = { email, id: data.session.user.id };
-          setCurrentUser(userObj);
-          localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userObj));
+          if (currentUser?.email !== userObj.email || currentUser?.id !== userObj.id) {
+            skipNextCloudSyncRef.current = true;
+            setCurrentUser(userObj);
+            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userObj));
+          }
 
           // Fetch cloud data
           const cloudData = await fetchUserDataFromSupabase();
@@ -214,30 +219,44 @@ export const App: React.FC = () => {
 
     if (skipNextCloudSyncRef.current) {
       skipNextCloudSyncRef.current = false;
+      setSyncStatus((prev) => (prev === 'syncing' ? 'idle' : prev));
       return;
     }
 
-    if (!currentUser) return;
+    if (!currentUserIdOrEmail) return;
 
-    setSyncStatus('syncing');
+    let cancelled = false;
     const timer = setTimeout(async () => {
-      const res = await syncUserDataToSupabase({
-        routines,
-        prs,
-        history,
-        catalog: catalogExercises,
-      });
+      if (cancelled) return;
+      setSyncStatus('syncing');
 
-      if (res.success) {
-        setSyncStatus('synced');
-        setTimeout(() => setSyncStatus('idle'), 3000);
-      } else {
-        setSyncStatus('error');
+      try {
+        const res = await syncUserDataToSupabase({
+          routines,
+          prs,
+          history,
+          catalog: catalogExercises,
+        });
+
+        if (cancelled) return;
+        if (res.success) {
+          setSyncStatus('synced');
+          setTimeout(() => {
+            if (!cancelled) setSyncStatus('idle');
+          }, 2500);
+        } else {
+          setSyncStatus('error');
+        }
+      } catch {
+        if (!cancelled) setSyncStatus('error');
       }
-    }, 1500);
+    }, 1200);
 
-    return () => clearTimeout(timer);
-  }, [routines, prs, history, catalogExercises, currentUser]);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [routines, prs, history, catalogExercises, currentUserIdOrEmail]);
 
   // Login handler
   const handleLoginSuccess = async (user: { email: string; id?: string }) => {

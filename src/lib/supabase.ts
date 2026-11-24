@@ -28,6 +28,15 @@ export const MASTER_USER = {
 
 const MAX_CLOUD_PAYLOAD_CHARS = 7500;
 
+function withTimeout<T>(promise: Promise<T>, ms = 10000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error('Tempo limite excedido ao conectar com o Supabase.')), ms)
+    ),
+  ]);
+}
+
 export interface CloudSyncPayload {
   routines?: DayRoutine[];
   prs?: PersonalRecord[];
@@ -209,12 +218,12 @@ export async function syncUserDataToSupabase(
       },
     };
 
-    let { error } = await supabase.auth.updateUser(updateBody);
+    let { error } = await withTimeout(supabase.auth.updateUser(updateBody), 10000);
 
     // Retry once after refreshing session if JWT was stale/oversized
     if (error) {
-      await supabase.auth.refreshSession();
-      const retry = await supabase.auth.updateUser(updateBody);
+      await withTimeout(supabase.auth.refreshSession(), 8000);
+      const retry = await withTimeout(supabase.auth.updateUser(updateBody), 10000);
       error = retry.error;
     }
 
