@@ -17,7 +17,7 @@ import { HistoryView } from './components/HistoryView';
 import { ExerciseCatalogView } from './components/ExerciseCatalogView';
 import { LoginScreen } from './components/LoginScreen';
 import { BiometricsEnrollModal } from './components/BiometricsEnrollModal';
-import { supabase, syncUserDataToSupabase, fetchUserDataFromSupabase } from './lib/supabase';
+import { supabase, MASTER_USER, syncUserDataToSupabase, fetchUserDataFromSupabase } from './lib/supabase';
 
 const STORAGE_KEYS = {
   USER: 'iron_routine_auth_user_v1',
@@ -123,10 +123,45 @@ export const App: React.FC = () => {
   const [activeWorkoutRoutine, setActiveWorkoutRoutine] = useState<DayRoutine | null>(null);
 
   // Sync session with Supabase on mount
+  const skipNextCloudSyncRef = useRef(false);
+
+  const applyCloudData = (cloudData: {
+    routines?: DayRoutine[];
+    prs?: PersonalRecord[];
+    history?: CompletedWorkoutSummary[];
+    catalog?: BaseExercise[];
+  }) => {
+    skipNextCloudSyncRef.current = true;
+    if (Array.isArray(cloudData.routines) && cloudData.routines.length > 0) {
+      setRoutines(cloudData.routines);
+    }
+    if (Array.isArray(cloudData.prs)) {
+      setPRs(cloudData.prs);
+    }
+    if (Array.isArray(cloudData.history)) {
+      setHistory(cloudData.history.filter((w) => !w.id.startsWith('seed-workout')));
+    }
+    if (Array.isArray(cloudData.catalog) && cloudData.catalog.length > 0) {
+      setCatalogExercises(cloudData.catalog);
+    }
+  };
+
   useEffect(() => {
     async function checkSupabaseSession() {
       try {
-        const { data } = await supabase.auth.getSession();
+        let { data } = await supabase.auth.getSession();
+
+        // If user is logged in locally as master without an active Supabase token, establish session
+        if (!data.session?.user && currentUser?.email === MASTER_USER.email) {
+          const signInRes = await supabase.auth.signInWithPassword({
+            email: MASTER_USER.email,
+            password: MASTER_USER.password,
+          });
+          if (signInRes.data?.session) {
+            data = { session: signInRes.data.session };
+          }
+        }
+
         if (data.session?.user) {
           const email = data.session.user.email || 'vini@gmail.com';
           const userObj = { email, id: data.session.user.id };
@@ -136,20 +171,7 @@ export const App: React.FC = () => {
           // Fetch cloud data
           const cloudData = await fetchUserDataFromSupabase();
           if (cloudData) {
-            if (Array.isArray(cloudData.routines) && cloudData.routines.length > 0) {
-              setRoutines(cloudData.routines as DayRoutine[]);
-            }
-            if (Array.isArray(cloudData.prs)) {
-              setPRs(cloudData.prs as PersonalRecord[]);
-            }
-            if (Array.isArray(cloudData.history)) {
-              setHistory((cloudData.history as CompletedWorkoutSummary[]).filter(
-                (w) => !w.id.startsWith('seed-workout')
-              ));
-            }
-            if (Array.isArray(cloudData.catalog) && cloudData.catalog.length > 0) {
-              setCatalogExercises(cloudData.catalog as BaseExercise[]);
-            }
+            applyCloudData(cloudData);
           }
         }
       } catch (err) {
@@ -200,6 +222,11 @@ export const App: React.FC = () => {
       return;
     }
 
+    if (skipNextCloudSyncRef.current) {
+      skipNextCloudSyncRef.current = false;
+      return;
+    }
+
     if (!currentUser) return;
 
     setSyncStatus('syncing');
@@ -224,25 +251,25 @@ export const App: React.FC = () => {
 
   // Login handler
   const handleLoginSuccess = async (user: { email: string; id?: string }) => {
+    skipNextCloudSyncRef.current = true;
     setCurrentUser(user);
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
 
     // Restore cloud data if available in Supabase
     const cloudData = await fetchUserDataFromSupabase();
     if (cloudData) {
-      if (Array.isArray(cloudData.routines) && cloudData.routines.length > 0) {
-        setRoutines(cloudData.routines as DayRoutine[]);
-      }
-      if (Array.isArray(cloudData.prs)) {
-        setPRs(cloudData.prs as PersonalRecord[]);
-      }
-      if (Array.isArray(cloudData.history)) {
-        setHistory((cloudData.history as CompletedWorkoutSummary[]).filter(
-          (w) => !w.id.startsWith('seed-workout')
-        ));
-      }
-      if (Array.isArray(cloudData.catalog) && cloudData.catalog.length > 0) {
-        setCatalogExercises(cloudData.catalog as BaseExercise[]);
+      applyCloudData(cloudData);
+    } else {
+      // First cloud sync for this account
+      const res = await syncUserDataToSupabase({
+        routines,
+        prs,
+        history,
+        catalog: catalogExercises,
+      });
+      if (res.success) {
+        setSyncStatus('synced');
+        setTimeout(() => setSyncStatus('idle'), 3000);
       }
     }
   };
