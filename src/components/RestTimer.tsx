@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, FastForward, Plus, Minus, Volume2, VolumeX, Maximize2, Minimize2, BellRing, Sparkles } from 'lucide-react';
 import { formatTime } from '../utils/calc';
-import { playCountdownTick, playRestFinishAlert, vibrateDevice } from '../utils/sound';
+import { playClockTickTock, playRestFinishAlert, unlockAudio, vibrateDevice } from '../utils/sound';
 
 interface RestTimerProps {
   remainingSeconds: number;
   totalSeconds: number;
   isPaused: boolean;
+  isMuted?: boolean;
   exerciseName?: string;
   setNumber?: number;
   onAddSeconds: (seconds: number) => void;
   onTogglePause: () => void;
+  onToggleMute?: () => void;
   onSkip: () => void;
 }
 
@@ -18,21 +20,33 @@ export const RestTimer: React.FC<RestTimerProps> = ({
   remainingSeconds,
   totalSeconds,
   isPaused,
+  isMuted: controlledMuted,
   exerciseName,
   setNumber,
   onAddSeconds,
   onTogglePause,
+  onToggleMute,
   onSkip,
 }) => {
-  const [isMuted, setIsMuted] = useState(false);
+  const [localMuted, setLocalMuted] = useState(false);
+  const isMuted = controlledMuted !== undefined ? controlledMuted : localMuted;
   const [isMinimized, setIsMinimized] = useState(false);
 
-  // Sound triggers at last 3 seconds
+  const handleToggleMute = () => {
+    unlockAudio();
+    if (onToggleMute) {
+      onToggleMute();
+    } else {
+      setLocalMuted((prev) => !prev);
+    }
+  };
+
+  // Loud clock tic-tac on the final 5 seconds (5, 4, 3, 2, 1)
   useEffect(() => {
     if (isPaused || isMuted) return;
 
-    if (remainingSeconds === 3 || remainingSeconds === 2 || remainingSeconds === 1) {
-      playCountdownTick();
+    if (remainingSeconds <= 5 && remainingSeconds >= 1) {
+      playClockTickTock(remainingSeconds);
     } else if (remainingSeconds === 0) {
       playRestFinishAlert();
       vibrateDevice([300, 150, 400]);
@@ -135,7 +149,7 @@ export const RestTimer: React.FC<RestTimerProps> = ({
           {/* Minimize and Mute icons on mobile */}
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setIsMuted(!isMuted)}
+              onClick={handleToggleMute}
               title={isMuted ? 'Ativar Som' : 'Silenciar'}
               className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white"
             >

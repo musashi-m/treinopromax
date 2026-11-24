@@ -15,7 +15,7 @@ import type {
 import { ExerciseMedia } from './ExerciseMedia';
 import { RestTimer } from './RestTimer';
 import { formatTime, calculate1RM } from '../utils/calc';
-import { playPRFanfare, playBeep, vibrateDevice } from '../utils/sound';
+import { playPRFanfare, playBeep, playRestFinishAlert, unlockAudio, vibrateDevice } from '../utils/sound';
 
 interface ActiveWorkoutProps {
   routine: DayRoutine;
@@ -74,6 +74,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
   const [restRemaining, setRestRemaining] = useState<number>(0);
   const [restTotal, setRestTotal] = useState<number>(60);
   const [isRestPaused, setIsRestPaused] = useState<boolean>(false);
+  const [isRestMuted, setIsRestMuted] = useState<boolean>(false);
   const [activeRestContext, setActiveRestContext] = useState<{ exerciseName: string; setNumber: number } | null>(null);
 
   // New PRs achieved in this active workout
@@ -98,14 +99,18 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
     return () => clearInterval(interval);
   }, [isWorkoutPaused]);
 
-  // Rest countdown interval
+  // Rest countdown interval (single non-drifting interval while active)
+  const isRestActive = restRemaining > 0 && !isRestPaused;
   useEffect(() => {
-    if (restRemaining <= 0 || isRestPaused) return;
+    if (!isRestActive) return;
 
     const interval = setInterval(() => {
       setRestRemaining((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
+          if (!isRestMuted) {
+            playRestFinishAlert();
+          }
           return 0;
         }
         return prev - 1;
@@ -113,10 +118,11 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [restRemaining, isRestPaused]);
+  }, [isRestActive, isRestMuted]);
 
   // Handle adding/subtracting rest time (+15s / -15s)
   const handleAddRestSeconds = (seconds: number) => {
+    unlockAudio();
     setRestRemaining((prev) => {
       const next = Math.max(0, prev + seconds);
       return next;
@@ -137,6 +143,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
 
   // Toggle set completion and PR detection
   const handleToggleSetComplete = (exIndex: number, setIndex: number) => {
+    unlockAudio();
     setExercisesProgress((prev) => {
       const updated = [...prev];
       const targetEx = { ...updated[exIndex] };
@@ -462,6 +469,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                   <button
                     type="button"
                     onClick={() => {
+                      unlockAudio();
                       setRestTotal(ex.restSeconds || 60);
                       setRestRemaining(ex.restSeconds || 60);
                       setIsRestPaused(false);
@@ -843,11 +851,17 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
           remainingSeconds={restRemaining}
           totalSeconds={restTotal}
           isPaused={isRestPaused}
+          isMuted={isRestMuted}
           exerciseName={activeRestContext?.exerciseName}
           setNumber={activeRestContext?.setNumber}
           onAddSeconds={handleAddRestSeconds}
-          onTogglePause={() => setIsRestPaused(!isRestPaused)}
+          onTogglePause={() => {
+            unlockAudio();
+            setIsRestPaused(!isRestPaused);
+          }}
+          onToggleMute={() => setIsRestMuted((m) => !m)}
           onSkip={() => {
+            unlockAudio();
             setRestRemaining(0);
             setActiveRestContext(null);
           }}
