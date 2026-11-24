@@ -20,11 +20,11 @@ export const ManualWorkoutModal: React.FC<ManualWorkoutModalProps> = ({
   const todayStr = initialDate || new Date().toISOString().split('T')[0];
 
   const [date, setDate] = useState(todayStr);
-  const [muscleSplit, setMuscleSplit] = useState('Peito & Tríceps');
-  const [durationMinutes, setDurationMinutes] = useState(50);
-  const [totalVolumeKg, setTotalVolumeKg] = useState(3800);
-  const [totalSets, setTotalSets] = useState(16);
-  const [totalReps, setTotalReps] = useState(160);
+  const [muscleSplit, setMuscleSplit] = useState('');
+  const [durationMinutes, setDurationMinutes] = useState(0);
+  const [totalVolumeKg, setTotalVolumeKg] = useState(0);
+  const [totalSets, setTotalSets] = useState(0);
+  const [totalReps, setTotalReps] = useState(0);
   const [notes, setNotes] = useState('');
 
   const quickSplits = [
@@ -58,7 +58,7 @@ export const ManualWorkoutModal: React.FC<ManualWorkoutModalProps> = ({
     ];
     const dayName = weekdays[workoutDate.getDay()] || 'Treino';
 
-    const durationSeconds = (Number(durationMinutes) || 45) * 60;
+    const durationSeconds = (Number(durationMinutes) || 0) * 60;
 
     const newWorkout: CompletedWorkoutSummary = {
       id: `manual-workout-${Date.now()}`,
@@ -77,8 +77,8 @@ export const ManualWorkoutModal: React.FC<ManualWorkoutModalProps> = ({
           name: muscleSplit.trim(),
           muscleGroup: 'geral',
           sets: Array.from({ length: Math.min(totalSets, 10) }, () => ({
-            weight: Math.round((Number(totalVolumeKg) || 100) / Math.max(1, totalReps)),
-            reps: Math.round((Number(totalReps) || 10) / Math.max(1, Math.min(totalSets, 10))),
+            weight: Math.round((Number(totalVolumeKg) || 0) / Math.max(1, totalReps)),
+            reps: Math.round((Number(totalReps) || 0) / Math.max(1, Math.min(totalSets, 10))),
             completed: true,
           })),
         },

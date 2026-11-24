@@ -18,14 +18,14 @@ export const PRTrackerView: React.FC<PRTrackerViewProps> = ({
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // 1RM interactive calculator state
-  const [calcWeight, setCalcWeight] = useState(80);
-  const [calcReps, setCalcReps] = useState(8);
+  const [calcWeight, setCalcWeight] = useState(0);
+  const [calcReps, setCalcReps] = useState(0);
   const calculated1RM = calculate1RM(calcWeight, calcReps);
 
   // Manual PR form state
   const [formExerciseName, setFormExerciseName] = useState('');
-  const [formWeight, setFormWeight] = useState(60);
-  const [formReps, setFormReps] = useState(10);
+  const [formWeight, setFormWeight] = useState(0);
+  const [formReps, setFormReps] = useState(0);
 
   // Enrich PRs with muscle group from library if possible
   const enrichedPRs = prs.map((pr) => {

@@ -3,7 +3,7 @@ import {
   Play, Plus, Dumbbell, ChevronUp, ChevronDown, Trash2, 
   Edit3, Coffee, Calendar, Trophy, Clock, LayoutTemplate
 } from 'lucide-react';
-import type { DayRoutine, WorkoutExercise } from '../types/workout';
+import type { BaseExercise, DayRoutine, WorkoutExercise } from '../types/workout';
 import { ExerciseMedia } from './ExerciseMedia';
 import { ExerciseLibraryModal } from './ExerciseLibraryModal';
 import { ExerciseEditorModal } from './ExerciseEditorModal';
@@ -12,6 +12,7 @@ import { ROUTINE_TEMPLATES } from '../data/defaultRoutines';
 
 interface WeeklyRoutineViewProps {
   routines: DayRoutine[];
+  catalog?: BaseExercise[];
   selectedDayId: string;
   onSelectDay: (dayId: string) => void;
   onUpdateDayRoutine: (updated: DayRoutine) => void;
@@ -21,6 +22,7 @@ interface WeeklyRoutineViewProps {
 
 export const WeeklyRoutineView: React.FC<WeeklyRoutineViewProps> = ({
   routines,
+  catalog,
   selectedDayId,
   onSelectDay,
   onUpdateDayRoutine,
@@ -206,7 +208,10 @@ export const WeeklyRoutineView: React.FC<WeeklyRoutineViewProps> = ({
                 </h2>
                 <button
                   type="button"
-                  onClick={() => setIsEditingSplitName(true)}
+                  onClick={() => {
+                    setSplitNameInput(currentDay.muscleSplit);
+                    setIsEditingSplitName(true);
+                  }}
                   className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
                   title="Editar nome da divisão muscular"
                 >
@@ -235,8 +240,9 @@ export const WeeklyRoutineView: React.FC<WeeklyRoutineViewProps> = ({
 
             <button
               type="button"
+              disabled={currentDay.exercises.length === 0}
               onClick={() => onStartWorkout(currentDay)}
-              className="flex-1 sm:flex-none px-6 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl shadow-emerald-500/30 transition-all group"
+              className="flex-1 sm:flex-none px-6 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 text-slate-950 font-black text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl shadow-emerald-500/30 transition-all group"
             >
               <Play className="w-5 h-5 fill-slate-950 group-hover:scale-110 transition-transform" />
               <span>INICIAR TREINO</span>
@@ -402,6 +408,7 @@ export const WeeklyRoutineView: React.FC<WeeklyRoutineViewProps> = ({
         isOpen={isLibraryOpen}
         onClose={() => setIsLibraryOpen(false)}
         onSelectExercise={handleAddExercise}
+        catalog={catalog}
       />
 
       {/* Edit Exercise Modal */}

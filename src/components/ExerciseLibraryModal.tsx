@@ -7,12 +7,14 @@ interface ExerciseLibraryModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectExercise: (exercise: WorkoutExercise) => void;
+  catalog?: BaseExercise[];
 }
 
 export const ExerciseLibraryModal: React.FC<ExerciseLibraryModalProps> = ({
   isOpen,
   onClose,
   onSelectExercise,
+  catalog,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMuscle, setSelectedMuscle] = useState<MuscleGroup | 'todos'>('todos');
@@ -30,7 +32,9 @@ export const ExerciseLibraryModal: React.FC<ExerciseLibraryModalProps> = ({
 
   if (!isOpen) return null;
 
-  const filteredExercises = EXERCISE_LIBRARY.filter((ex) => {
+  const sourceCatalog = catalog && catalog.length > 0 ? catalog : EXERCISE_LIBRARY;
+
+  const filteredExercises = sourceCatalog.filter((ex) => {
     const matchesSearch =
       ex.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       ex.equipment.toLowerCase().includes(searchTerm.toLowerCase());
@@ -50,8 +54,8 @@ export const ExerciseLibraryModal: React.FC<ExerciseLibraryModalProps> = ({
       targetReps: base.defaultReps,
       restSeconds: base.defaultRestSeconds,
       notes: base.tips.length > 0 ? base.tips[0] : '',
-      lastWeight: 20,
-      lastReps: 10,
+      lastWeight: undefined,
+      lastReps: undefined,
     };
     onSelectExercise(workoutEx);
     onClose();
@@ -73,8 +77,8 @@ export const ExerciseLibraryModal: React.FC<ExerciseLibraryModalProps> = ({
       targetReps: customReps,
       restSeconds: customRest,
       notes: customEquipment,
-      lastWeight: 10,
-      lastReps: 10,
+      lastWeight: undefined,
+      lastReps: undefined,
     };
 
     onSelectExercise(workoutEx);

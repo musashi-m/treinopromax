@@ -7,7 +7,7 @@ import type {
   WorkoutExercise,
   BaseExercise 
 } from './types/workout';
-import { DEFAULT_WEEK_ROUTINE } from './data/defaultRoutines';
+import { DEFAULT_WEEK_ROUTINE, EMPTY_WEEK_ROUTINE } from './data/defaultRoutines';
 import { EXERCISE_LIBRARY } from './data/exerciseLibrary';
 import { Navbar } from './components/Navbar';
 import { WeeklyRoutineView } from './components/WeeklyRoutineView';
@@ -21,8 +21,8 @@ import { supabase, MASTER_USER, syncUserDataToSupabase, fetchUserDataFromSupabas
 
 const STORAGE_KEYS = {
   USER: 'iron_routine_auth_user_v1',
-  ROUTINES: 'iron_routine_days_v1',
-  PRS: 'iron_routine_prs_v1',
+  ROUTINES: 'iron_routine_days_v2',
+  PRS: 'iron_routine_prs_v2',
   HISTORY: 'iron_routine_history_v1',
   CATALOG: 'iron_routine_catalog_v1',
 };
@@ -68,7 +68,7 @@ export const App: React.FC = () => {
     return EXERCISE_LIBRARY;
   });
 
-  // State: Routines (Weekly Days)
+  // State: Routines (Weekly Days - clean empty start, no mock workouts)
   const [routines, setRoutines] = useState<DayRoutine[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.ROUTINES);
@@ -76,10 +76,10 @@ export const App: React.FC = () => {
     } catch (e) {
       console.error('Error loading routines from localStorage', e);
     }
-    return DEFAULT_WEEK_ROUTINE;
+    return EMPTY_WEEK_ROUTINE;
   });
 
-  // State: PRs
+  // State: PRs (CLEAN, NO MOCK DATA - user registers their own PRs)
   const [prs, setPRs] = useState<PersonalRecord[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.PRS);
@@ -87,17 +87,7 @@ export const App: React.FC = () => {
     } catch (e) {
       console.error('Error loading PRs from localStorage', e);
     }
-    // Extract initial PRs from default routine
-    const initialList: PersonalRecord[] = [];
-    DEFAULT_WEEK_ROUTINE.forEach((day) => {
-      day.exercises.forEach((ex) => {
-        if (ex.currentPR) {
-          const exists = initialList.some((p) => p.exerciseName === ex.name);
-          if (!exists) initialList.push(ex.currentPR);
-        }
-      });
-    });
-    return initialList;
+    return [];
   });
 
   // State: History (CLEAN, NO MOCK DATA)
@@ -529,13 +519,14 @@ export const App: React.FC = () => {
     }
   };
 
-  // Reset to initial defaults
+  // Reset to clean empty state (no mock data)
   const handleResetData = () => {
     localStorage.removeItem(STORAGE_KEYS.ROUTINES);
     localStorage.removeItem(STORAGE_KEYS.PRS);
     localStorage.removeItem(STORAGE_KEYS.HISTORY);
     localStorage.removeItem(STORAGE_KEYS.CATALOG);
-    setRoutines(DEFAULT_WEEK_ROUTINE);
+    setRoutines(EMPTY_WEEK_ROUTINE);
+    setPRs([]);
     setCatalogExercises(EXERCISE_LIBRARY);
     setHistory([]);
     setSelectedDayId('seg');
@@ -604,6 +595,7 @@ export const App: React.FC = () => {
         ) : currentTab === 'semana' ? (
           <WeeklyRoutineView
             routines={routines}
+            catalog={catalogExercises}
             selectedDayId={selectedDayId}
             onSelectDay={setSelectedDayId}
             onUpdateDayRoutine={handleUpdateDayRoutine}

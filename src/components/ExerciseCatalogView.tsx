@@ -49,8 +49,8 @@ export const ExerciseCatalogView: React.FC<ExerciseCatalogViewProps> = ({
       targetReps: base.defaultReps,
       restSeconds: base.defaultRestSeconds,
       notes: base.equipment,
-      lastWeight: 20,
-      lastReps: 10,
+      lastWeight: undefined,
+      lastReps: undefined,
     };
 
     onAddExerciseToDay(selectedDayToAdd, workoutEx);
