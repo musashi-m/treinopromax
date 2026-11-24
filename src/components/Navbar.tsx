@@ -50,10 +50,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const navItems = [
-    { id: 'semana' as ViewTab, label: 'Rotina Semanal', icon: Calendar },
-    { id: 'exercicios' as ViewTab, label: 'Catálogo & GIFs', icon: BookOpen },
-    { id: 'prs' as ViewTab, label: 'Recordes (PRs)', icon: Trophy },
-    { id: 'historico' as ViewTab, label: 'Histórico & Calendário', icon: History },
+    { id: 'semana' as ViewTab, label: 'Rotina Semanal', mobileLabel: 'Rotina', icon: Calendar },
+    { id: 'exercicios' as ViewTab, label: 'Catálogo & GIFs', mobileLabel: 'Catálogo', icon: BookOpen },
+    { id: 'prs' as ViewTab, label: 'Recordes (PRs)', mobileLabel: 'PRs', icon: Trophy },
+    { id: 'historico' as ViewTab, label: 'Histórico & Calendário', mobileLabel: 'Histórico', icon: History },
   ];
 
   return (
@@ -120,26 +120,40 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* User profile & Supabase cloud sync badge */}
             {user && (
-              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Conectado ao Supabase" />
-                <span className="font-mono text-slate-200 text-[11px] truncate max-w-[130px]">{user.email}</span>
+              <>
+                {/* Mobile compact biometrics button */}
                 {onRegisterBiometrics && (
                   <button
                     type="button"
                     onClick={onRegisterBiometrics}
-                    className="p-1 rounded-md text-slate-400 hover:text-emerald-400 hover:bg-slate-800 transition-colors ml-0.5"
-                    title="Cadastrar / Atualizar Chave de Acesso Biométrica"
+                    className="sm:hidden p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-slate-800 transition-colors"
+                    title="Cadastrar Biometria (Passkey)"
                   >
-                    <Fingerprint className="w-3.5 h-3.5" />
+                    <Fingerprint className="w-4 h-4" />
                   </button>
                 )}
-              </div>
+
+                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Conectado ao Supabase" />
+                  <span className="font-mono text-slate-200 text-[11px] truncate max-w-[130px]">{user.email}</span>
+                  {onRegisterBiometrics && (
+                    <button
+                      type="button"
+                      onClick={onRegisterBiometrics}
+                      className="p-1 rounded-md text-slate-400 hover:text-emerald-400 hover:bg-slate-800 transition-colors ml-0.5"
+                      title="Cadastrar / Atualizar Chave de Acesso Biométrica"
+                    >
+                      <Fingerprint className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </>
             )}
 
             <button
               type="button"
               onClick={() => setIsBackupModalOpen(true)}
-              className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition-colors"
+              className="p-2.5 sm:p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition-colors"
               title="Backup / Dados"
             >
               <Download className="w-4 h-4" />
@@ -150,7 +164,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={onLogout}
-                className="p-2 rounded-xl bg-slate-900 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border border-slate-800 hover:border-red-500/40 transition-colors"
+                className="p-2.5 sm:p-2 rounded-xl bg-slate-900 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border border-slate-800 hover:border-red-500/40 transition-colors"
                 title="Sair da conta"
               >
                 <LogOut className="w-4 h-4" />
@@ -160,8 +174,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </nav>
 
-      {/* Mobile Bottom Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0f1420]/95 border-t border-slate-800/90 backdrop-blur-lg px-2 py-2">
+      {/* Mobile Bottom Navigation Bar (Android safe-area aware) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0f1420]/95 border-t border-slate-800/90 backdrop-blur-lg px-2 pt-1.5 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
         <div className="grid grid-cols-4 gap-1">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -171,14 +185,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 key={item.id}
                 type="button"
                 onClick={() => onSelectTab(item.id)}
-                className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition-all ${
+                className={`flex flex-col items-center justify-center py-2 rounded-xl min-h-[50px] transition-all active:scale-95 ${
                   isActive
-                    ? 'text-emerald-400 font-black'
+                    ? 'text-emerald-400 bg-emerald-500/10 font-black'
                     : 'text-slate-500 hover:text-slate-300'
                 }`}
               >
                 <Icon className={`w-5 h-5 mb-0.5 ${isActive ? 'text-emerald-400 stroke-[2.5]' : ''}`} />
-                <span className="text-[10px] tracking-tight">{item.label.split(' ')[0]}</span>
+                <span className="text-[11px] tracking-tight leading-none">{item.mobileLabel}</span>
               </button>
             );
           })}

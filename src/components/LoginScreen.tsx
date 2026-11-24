@@ -145,12 +145,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f17] flex items-center justify-center p-4 relative overflow-hidden text-slate-100">
+    <div className="min-h-[100dvh] bg-[#0b0f17] flex items-center justify-center p-3 sm:p-4 relative overflow-hidden text-slate-100">
       {/* Background ambient decorative glows */}
       <div className="absolute top-1/4 -left-20 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-md w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative z-10 animate-scaleUp">
+      <div className="max-w-md w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-xl relative z-10 animate-scaleUp">
         {/* Brand Header */}
         <div className="text-center mb-6">
           <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-0.5 mx-auto mb-3 shadow-xl shadow-emerald-500/20">

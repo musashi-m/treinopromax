@@ -263,8 +263,8 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
           id: `set-${targetEx.workoutExerciseId}-${newSetNumber}-${Date.now()}`,
           setNumber: newSetNumber,
           targetReps: lastSet ? lastSet.targetReps : '10',
-          weight: lastSet ? lastSet.weight : 20,
-          reps: lastSet ? lastSet.reps : 10,
+          weight: lastSet ? lastSet.weight : 0,
+          reps: lastSet ? lastSet.reps : 0,
           completed: false,
           previousWeight: lastSet?.previousWeight,
           previousReps: lastSet?.previousReps,
@@ -341,32 +341,32 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f17] pb-32 text-slate-100">
-      {/* Sticky Workout Top HUD */}
+    <div className="min-h-[100dvh] bg-[#0b0f17] pb-40 text-slate-100">
+      {/* Sticky Workout Top HUD (Mobile-first Android friendly) */}
       <header className="sticky top-0 z-40 bg-[#0f1420]/95 backdrop-blur-md border-b border-slate-800 shadow-xl">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
           {/* Left: Day & Split */}
-          <div className="flex flex-col">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Treino em Andamento
+          <div className="flex flex-col min-w-0 flex-1 sm:flex-none">
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+              Em Andamento
             </span>
-            <h1 className="text-base sm:text-lg font-black text-white truncate max-w-[200px] sm:max-w-xs">
+            <h1 className="text-sm sm:text-lg font-black text-white truncate max-w-[155px] sm:max-w-xs">
               {routine.muscleSplit}
             </h1>
-            <span className="text-xs text-slate-400 font-medium">{routine.dayName}</span>
+            <span className="text-[11px] text-slate-400 font-medium hidden sm:block">{routine.dayName}</span>
           </div>
 
           {/* Center: Live Timer */}
-          <div className="flex items-center gap-2 bg-slate-900/90 border border-slate-700/80 px-3.5 py-1.5 rounded-2xl shadow-inner">
-            <Clock className="w-4 h-4 text-emerald-400" />
-            <span className="font-mono text-base sm:text-xl font-black text-white tracking-wider">
+          <div className="flex items-center gap-1.5 sm:gap-2 bg-slate-900/90 border border-slate-700/80 px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-2xl shadow-inner">
+            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
+            <span className="font-mono text-sm sm:text-xl font-black text-white tracking-wider">
               {formatTime(elapsedSeconds)}
             </span>
             <button
               onClick={() => setIsWorkoutPaused(!isWorkoutPaused)}
               title={isWorkoutPaused ? 'Retomar Treino' : 'Pausar Treino'}
-              className="p-1 rounded-lg text-slate-400 hover:text-white"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white"
             >
               {isWorkoutPaused ? (
                 <Play className="w-4 h-4 text-emerald-400 fill-emerald-400" />
@@ -377,37 +377,38 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               onClick={() => setShowCancelConfirm(true)}
-              className="p-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+              className="p-2.5 sm:p-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-slate-800 sm:border-transparent transition-colors"
               title="Cancelar treino"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
             <button
               onClick={() => setShowSummaryModal(true)}
-              className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-lg shadow-emerald-500/20 transition-all"
+              className="px-3 sm:px-3.5 py-2.5 sm:py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black text-xs sm:text-sm flex items-center gap-1 shadow-lg shadow-emerald-500/20 transition-all"
             >
-              <Check className="w-4 h-4" /> Finalizar
+              <Check className="w-4 h-4" />
+              <span>Finalizar</span>
             </button>
           </div>
         </div>
 
         {/* Real-time metrics bar with all 4 metrics */}
-        <div className="max-w-4xl mx-auto px-4 py-2 bg-slate-950/60 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-400 flex-wrap gap-2">
-          <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-            <span className="flex items-center gap-1.5" title="Séries Concluídas">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              Séries: <strong className="text-white font-mono">{completedSets}/{totalSets}</strong>
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-2 bg-slate-950/60 border-t border-slate-800/60 flex items-center justify-between text-[11px] sm:text-xs text-slate-400 flex-wrap gap-2">
+          <div className="grid grid-cols-3 sm:flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
+            <span className="flex items-center gap-1 truncate" title="Séries Concluídas">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+              <span>Séries:</span> <strong className="text-white font-mono">{completedSets}/{totalSets}</strong>
             </span>
-            <span className="flex items-center gap-1.5" title="Carga Total (Volume)">
-              <Dumbbell className="w-3.5 h-3.5 text-sky-400" />
-              Carga Total: <strong className="text-white font-mono">{totalVolumeKg.toLocaleString()} kg</strong>
+            <span className="flex items-center justify-center sm:justify-start gap-1 truncate" title="Carga Total (Volume)">
+              <Dumbbell className="w-3.5 h-3.5 text-sky-400 flex-shrink-0" />
+              <span className="hidden xs:inline">Carga:</span> <strong className="text-white font-mono">{totalVolumeKg.toLocaleString()}kg</strong>
             </span>
-            <span className="flex items-center gap-1.5" title="Total de Repetições">
-              <Repeat className="w-3.5 h-3.5 text-pink-400" />
-              Reps: <strong className="text-white font-mono">{totalRepsCompleted}</strong>
+            <span className="flex items-center justify-end sm:justify-start gap-1 truncate" title="Total de Repetições">
+              <Repeat className="w-3.5 h-3.5 text-pink-400 flex-shrink-0" />
+              <span>Reps:</span> <strong className="text-white font-mono">{totalRepsCompleted}</strong>
             </span>
           </div>
 
@@ -457,7 +458,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                 </div>
 
                 {/* Right controls: GIF toggle & Manual rest button */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
                   <button
                     type="button"
                     onClick={() => {
@@ -466,7 +467,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                       setIsRestPaused(false);
                       setActiveRestContext({ exerciseName: ex.name, setNumber: 0 });
                     }}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-semibold border border-slate-700 transition-colors"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2.5 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-semibold border border-slate-700 transition-colors min-h-[42px] sm:min-h-0"
                   >
                     <Clock className="w-3.5 h-3.5 text-emerald-400" />
                     Descansar
@@ -480,7 +481,7 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
                         [ex.workoutExerciseId]: !prev[ex.workoutExerciseId],
                       }))
                     }
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                    className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2.5 sm:py-1.5 rounded-xl text-xs font-bold transition-all border min-h-[42px] sm:min-h-0 ${
                       isGifOpen
                         ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                         : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
@@ -516,148 +517,287 @@ export const ActiveWorkout: React.FC<ActiveWorkoutProps> = ({
               )}
 
               {/* Set-by-Set Logging Table */}
-              <div className="p-4 sm:p-5">
-                {/* Table Header */}
-                <div className="grid grid-cols-12 gap-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 pb-2 border-b border-slate-800 text-center">
+              <div className="p-3 sm:p-5">
+                {/* Desktop Table Header (hidden on mobile phones) */}
+                <div className="hidden sm:grid grid-cols-12 gap-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 pb-2 border-b border-slate-800 text-center">
                   <div className="col-span-2 text-left">Série</div>
-                  <div className="col-span-2 hidden sm:block">Anterior</div>
-                  <div className="col-span-4 sm:col-span-3">Carga (kg)</div>
-                  <div className="col-span-4 sm:col-span-3">Reps</div>
+                  <div className="col-span-2">Anterior</div>
+                  <div className="col-span-3">Carga (kg)</div>
+                  <div className="col-span-3">Reps</div>
                   <div className="col-span-2 text-right">Status</div>
                 </div>
 
                 {/* Set Rows */}
-                <div className="divide-y divide-slate-800/50">
+                <div className="space-y-2.5 sm:space-y-0 sm:divide-y sm:divide-slate-800/50">
                   {ex.sets.map((set, setIndex) => {
                     const isNewPR = !!set.isPR;
 
                     return (
-                      <div
-                        key={set.id}
-                        className={`grid grid-cols-12 gap-2 py-3 items-center text-center transition-colors rounded-xl px-1 ${
-                          set.completed ? 'bg-emerald-500/5' : 'hover:bg-slate-800/30'
-                        }`}
-                      >
-                        {/* Set Number */}
-                        <div className="col-span-2 text-left flex items-center gap-1.5">
-                          <span
-                            className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black ${
-                              set.completed
-                                ? 'bg-emerald-500 text-slate-950'
-                                : 'bg-slate-800 text-slate-300'
-                            }`}
-                          >
-                            {set.setNumber}
-                          </span>
-                          {isNewPR && (
-                            <span className="hidden md:inline-flex text-[10px] font-black text-amber-400 bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/30">
-                              PR! 🔥
+                      <div key={set.id}>
+                        {/* MOBILE ANDROID TOUCH CARD LAYOUT */}
+                        <div
+                          className={`sm:hidden rounded-2xl border p-3 space-y-2.5 transition-colors ${
+                            set.completed
+                              ? 'bg-emerald-500/10 border-emerald-500/40'
+                              : 'bg-slate-950/60 border-slate-800/90'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black ${
+                                  set.completed
+                                    ? 'bg-emerald-500 text-slate-950'
+                                    : 'bg-slate-800 text-slate-200'
+                                }`}
+                              >
+                                {set.setNumber}
+                              </span>
+                              <div>
+                                <span className="text-xs font-bold text-white block">
+                                  Série {set.setNumber}
+                                </span>
+                                {set.previousWeight !== undefined && (
+                                  <span className="text-[10px] text-slate-400 font-mono block">
+                                    Anterior: {set.previousWeight}kg × {set.previousReps || '-'}
+                                  </span>
+                                )}
+                              </div>
+                              {isNewPR && (
+                                <span className="text-[10px] font-black text-amber-400 bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/30">
+                                  PR! 🔥
+                                </span>
+                              )}
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => handleToggleSetComplete(exIndex, setIndex)}
+                              className={`px-3.5 py-2 rounded-xl flex items-center gap-1.5 font-black text-xs transition-all active:scale-95 min-h-[40px] ${
+                                set.completed
+                                  ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                                  : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
+                              }`}
+                            >
+                              <Check className={`w-4 h-4 ${set.completed ? 'stroke-[3]' : 'text-slate-400'}`} />
+                              <span>{set.completed ? 'Pronto' : 'Concluir'}</span>
+                            </button>
+                          </div>
+
+                          {/* 2-column numeric steppers optimized for Android thumbs */}
+                          <div className="grid grid-cols-2 gap-2">
+                            {/* Weight */}
+                            <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-1.5">
+                              <span className="text-[10px] font-bold uppercase text-slate-400 block text-center mb-1">
+                                Carga (kg)
+                              </span>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleAdjustWeight(exIndex, setIndex, -2.5)}
+                                  className="w-9 h-10 rounded-lg bg-slate-800 active:scale-95 text-slate-300 font-bold text-xs flex items-center justify-center"
+                                >
+                                  -2.5
+                                </button>
+                                <input
+                                  type="number"
+                                  inputMode="decimal"
+                                  step="0.5"
+                                  value={set.weight}
+                                  onChange={(e) => {
+                                    const val = parseFloat(e.target.value) || 0;
+                                    setExercisesProgress((prev) => {
+                                      const up = [...prev];
+                                      const tEx = { ...up[exIndex] };
+                                      const tSets = [...tEx.sets];
+                                      tSets[setIndex] = { ...tSets[setIndex], weight: val };
+                                      tEx.sets = tSets;
+                                      up[exIndex] = tEx;
+                                      return up;
+                                    });
+                                  }}
+                                  className="w-full min-w-0 h-10 text-center font-mono font-black text-base rounded-lg bg-slate-950 border border-slate-700 text-white focus:border-emerald-500 focus:outline-none"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleAdjustWeight(exIndex, setIndex, +2.5)}
+                                  className="w-9 h-10 rounded-lg bg-slate-800 active:scale-95 text-emerald-400 font-bold text-xs flex items-center justify-center"
+                                >
+                                  +2.5
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Reps */}
+                            <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-1.5">
+                              <span className="text-[10px] font-bold uppercase text-slate-400 block text-center mb-1">
+                                Repetições
+                              </span>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleAdjustReps(exIndex, setIndex, -1)}
+                                  className="w-9 h-10 rounded-lg bg-slate-800 active:scale-95 text-slate-300 font-black text-base flex items-center justify-center"
+                                >
+                                  -
+                                </button>
+                                <input
+                                  type="number"
+                                  inputMode="numeric"
+                                  value={set.reps}
+                                  onChange={(e) => {
+                                    const val = parseInt(e.target.value, 10) || 0;
+                                    setExercisesProgress((prev) => {
+                                      const up = [...prev];
+                                      const tEx = { ...up[exIndex] };
+                                      const tSets = [...tEx.sets];
+                                      tSets[setIndex] = { ...tSets[setIndex], reps: val };
+                                      tEx.sets = tSets;
+                                      up[exIndex] = tEx;
+                                      return up;
+                                    });
+                                  }}
+                                  className="w-full min-w-0 h-10 text-center font-mono font-black text-base rounded-lg bg-slate-950 border border-slate-700 text-white focus:border-emerald-500 focus:outline-none"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleAdjustReps(exIndex, setIndex, +1)}
+                                  className="w-9 h-10 rounded-lg bg-slate-800 active:scale-95 text-emerald-400 font-black text-base flex items-center justify-center"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* DESKTOP / TABLET ROW LAYOUT */}
+                        <div
+                          className={`hidden sm:grid grid-cols-12 gap-2 py-3 items-center text-center transition-colors rounded-xl px-1 ${
+                            set.completed ? 'bg-emerald-500/5' : 'hover:bg-slate-800/30'
+                          }`}
+                        >
+                          {/* Set Number */}
+                          <div className="col-span-2 text-left flex items-center gap-1.5">
+                            <span
+                              className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black ${
+                                set.completed
+                                  ? 'bg-emerald-500 text-slate-950'
+                                  : 'bg-slate-800 text-slate-300'
+                              }`}
+                            >
+                              {set.setNumber}
                             </span>
-                          )}
-                        </div>
+                            {isNewPR && (
+                              <span className="hidden md:inline-flex text-[10px] font-black text-amber-400 bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/30">
+                                PR! 🔥
+                              </span>
+                            )}
+                          </div>
 
-                        {/* Previous Load */}
-                        <div className="col-span-2 hidden sm:block text-xs text-slate-500 font-mono">
-                          {set.previousWeight !== undefined ? `${set.previousWeight}kg × ${set.previousReps || '-'}` : '-'}
-                        </div>
+                          {/* Previous Load */}
+                          <div className="col-span-2 text-xs text-slate-500 font-mono">
+                            {set.previousWeight !== undefined ? `${set.previousWeight}kg × ${set.previousReps || '-'}` : '-'}
+                          </div>
 
-                        {/* Weight (Carga) Input with quick steppers */}
-                        <div className="col-span-4 sm:col-span-3 flex items-center justify-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => handleAdjustWeight(exIndex, setIndex, -1)}
-                            className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs hidden sm:block"
-                          >
-                            -1
-                          </button>
-                          <input
-                            type="number"
-                            step="0.5"
-                            value={set.weight}
-                            onChange={(e) => {
-                              const val = parseFloat(e.target.value) || 0;
-                              setExercisesProgress((prev) => {
-                                const up = [...prev];
-                                const tEx = { ...up[exIndex] };
-                                const tSets = [...tEx.sets];
-                                tSets[setIndex] = { ...tSets[setIndex], weight: val };
-                                tEx.sets = tSets;
-                                up[exIndex] = tEx;
-                                return up;
-                              });
-                            }}
-                            className={`w-16 sm:w-20 text-center font-mono font-black text-sm sm:text-base py-1.5 rounded-xl border transition-all ${
-                              set.completed
-                                ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300'
-                                : 'bg-slate-950 border-slate-700 text-white focus:border-emerald-500'
-                            }`}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => handleAdjustWeight(exIndex, setIndex, +2.5)}
-                            className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-bold hidden sm:block"
-                            title="+2.5 kg"
-                          >
-                            +2.5
-                          </button>
-                        </div>
+                          {/* Weight (Carga) Input with quick steppers */}
+                          <div className="col-span-3 flex items-center justify-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleAdjustWeight(exIndex, setIndex, -1)}
+                              className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs"
+                            >
+                              -1
+                            </button>
+                            <input
+                              type="number"
+                              inputMode="decimal"
+                              step="0.5"
+                              value={set.weight}
+                              onChange={(e) => {
+                                const val = parseFloat(e.target.value) || 0;
+                                setExercisesProgress((prev) => {
+                                  const up = [...prev];
+                                  const tEx = { ...up[exIndex] };
+                                  const tSets = [...tEx.sets];
+                                  tSets[setIndex] = { ...tSets[setIndex], weight: val };
+                                  tEx.sets = tSets;
+                                  up[exIndex] = tEx;
+                                  return up;
+                                });
+                              }}
+                              className={`w-20 text-center font-mono font-black text-base py-1.5 rounded-xl border transition-all ${
+                                set.completed
+                                  ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300'
+                                  : 'bg-slate-950 border-slate-700 text-white focus:border-emerald-500'
+                              }`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleAdjustWeight(exIndex, setIndex, +2.5)}
+                              className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-bold"
+                              title="+2.5 kg"
+                            >
+                              +2.5
+                            </button>
+                          </div>
 
-                        {/* Repetitions (Contagem de Repetição) with +/- buttons */}
-                        <div className="col-span-4 sm:col-span-3 flex items-center justify-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => handleAdjustReps(exIndex, setIndex, -1)}
-                            className="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-xs"
-                          >
-                            -
-                          </button>
-                          <input
-                            type="number"
-                            value={set.reps}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value, 10) || 0;
-                              setExercisesProgress((prev) => {
-                                const up = [...prev];
-                                const tEx = { ...up[exIndex] };
-                                const tSets = [...tEx.sets];
-                                tSets[setIndex] = { ...tSets[setIndex], reps: val };
-                                tEx.sets = tSets;
-                                up[exIndex] = tEx;
-                                return up;
-                              });
-                            }}
-                            className={`w-12 sm:w-16 text-center font-mono font-black text-sm sm:text-base py-1.5 rounded-xl border transition-all ${
-                              set.completed
-                                ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300'
-                                : 'bg-slate-950 border-slate-700 text-white focus:border-emerald-500'
-                            }`}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => handleAdjustReps(exIndex, setIndex, +1)}
-                            className="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-xs"
-                          >
-                            +
-                          </button>
-                        </div>
+                          {/* Repetitions (Contagem de Repetição) with +/- buttons */}
+                          <div className="col-span-3 flex items-center justify-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleAdjustReps(exIndex, setIndex, -1)}
+                              className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-xs"
+                            >
+                              -
+                            </button>
+                            <input
+                              type="number"
+                              inputMode="numeric"
+                              value={set.reps}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value, 10) || 0;
+                                setExercisesProgress((prev) => {
+                                  const up = [...prev];
+                                  const tEx = { ...up[exIndex] };
+                                  const tSets = [...tEx.sets];
+                                  tSets[setIndex] = { ...tSets[setIndex], reps: val };
+                                  tEx.sets = tSets;
+                                  up[exIndex] = tEx;
+                                  return up;
+                                });
+                              }}
+                              className={`w-16 text-center font-mono font-black text-base py-1.5 rounded-xl border transition-all ${
+                                set.completed
+                                  ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300'
+                                  : 'bg-slate-950 border-slate-700 text-white focus:border-emerald-500'
+                              }`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleAdjustReps(exIndex, setIndex, +1)}
+                              className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-xs"
+                            >
+                              +
+                            </button>
+                          </div>
 
-                        {/* Complete Checkbox Button */}
-                        <div className="col-span-2 flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleToggleSetComplete(exIndex, setIndex)}
-                            className={`p-2 sm:px-3 sm:py-2 rounded-xl flex items-center gap-1.5 font-bold text-xs transition-all active:scale-95 ${
-                              set.completed
-                                ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                                : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
-                            }`}
-                            title={set.completed ? 'Desmarcar série' : 'Concluir série e iniciar descanso'}
-                          >
-                            <Check className={`w-4 h-4 ${set.completed ? 'stroke-[3]' : 'text-slate-400'}`} />
-                            <span className="hidden sm:inline">
-                              {set.completed ? 'Pronto' : 'Concluir'}
-                            </span>
-                          </button>
+                          {/* Complete Checkbox Button */}
+                          <div className="col-span-2 flex justify-end">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleSetComplete(exIndex, setIndex)}
+                              className={`px-3 py-2 rounded-xl flex items-center gap-1.5 font-bold text-xs transition-all active:scale-95 ${
+                                set.completed
+                                  ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                                  : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
+                              }`}
+                              title={set.completed ? 'Desmarcar série' : 'Concluir série e iniciar descanso'}
+                            >
+                              <Check className={`w-4 h-4 ${set.completed ? 'stroke-[3]' : 'text-slate-400'}`} />
+                              <span>{set.completed ? 'Pronto' : 'Concluir'}</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );

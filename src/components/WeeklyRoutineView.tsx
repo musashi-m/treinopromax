@@ -111,9 +111,9 @@ export const WeeklyRoutineView: React.FC<WeeklyRoutineViewProps> = ({
   const todayId = dayIndexMap[todayIndex];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-      {/* Weekday Selector Bar */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-2 sm:p-3 shadow-xl backdrop-blur-md">
+    <div className="max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
+      {/* Weekday Selector Bar (Android compact 7-day strip) */}
+      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl sm:rounded-3xl p-1.5 sm:p-3 shadow-xl backdrop-blur-md">
         <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {routines.map((day) => {
             const isSelected = day.id === selectedDayId;
@@ -127,25 +127,25 @@ export const WeeklyRoutineView: React.FC<WeeklyRoutineViewProps> = ({
                   onSelectDay(day.id);
                   setSplitNameInput(day.muscleSplit);
                 }}
-                className={`flex flex-col items-center justify-center py-2.5 sm:py-3.5 px-1 rounded-2xl transition-all relative ${
+                className={`flex flex-col items-center justify-center py-2 sm:py-3.5 px-0.5 sm:px-1 rounded-xl sm:rounded-2xl min-h-[54px] transition-all active:scale-95 relative ${
                   isSelected
-                    ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/25 scale-[1.02] font-black'
+                    ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/25 font-black'
                     : 'bg-slate-950/60 hover:bg-slate-800 text-slate-300 border border-slate-800/80 hover:border-slate-700'
                 }`}
               >
                 {/* Today tiny indicator */}
                 {isToday && (
                   <span
-                    className={`text-[9px] font-black uppercase px-1.5 py-0.2 rounded-full mb-0.5 ${
+                    className={`text-[8px] sm:text-[9px] font-black uppercase px-1 sm:px-1.5 py-0.2 rounded-full mb-0.5 leading-tight ${
                       isSelected ? 'bg-black text-emerald-400' : 'bg-emerald-500/20 text-emerald-400'
                     }`}
                   >
                     Hoje
                   </span>
                 )}
-                <span className="text-xs sm:text-sm font-black">{day.shortName}</span>
-                <span className={`text-[10px] truncate max-w-full px-1 ${isSelected ? 'text-slate-900 font-bold' : 'text-slate-400'}`}>
-                  {day.isRestDay ? 'Descanso' : `${day.exercises.length} ex`}
+                <span className="text-[11px] sm:text-sm font-black tracking-tight">{day.shortName}</span>
+                <span className={`text-[9px] sm:text-[10px] truncate max-w-full px-0.5 ${isSelected ? 'text-slate-900 font-bold' : 'text-slate-400'}`}>
+                  {day.isRestDay ? 'Desc.' : `${day.exercises.length} ex`}
                 </span>
               </button>
             );
@@ -228,11 +228,11 @@ export const WeeklyRoutineView: React.FC<WeeklyRoutineViewProps> = ({
           </div>
 
           {/* Action Buttons: START WORKOUT & TEMPLATES */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 w-full md:w-auto">
             <button
               type="button"
               onClick={() => setShowTemplatesModal(true)}
-              className="px-3.5 py-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 font-bold text-xs sm:text-sm border border-slate-700 flex items-center gap-1.5 transition-colors"
+              className="px-3.5 py-3.5 sm:py-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 font-bold text-xs sm:text-sm border border-slate-700 flex items-center justify-center gap-1.5 transition-colors min-h-[46px]"
             >
               <LayoutTemplate className="w-4 h-4 text-sky-400" />
               Templates
@@ -242,7 +242,7 @@ export const WeeklyRoutineView: React.FC<WeeklyRoutineViewProps> = ({
               type="button"
               disabled={currentDay.exercises.length === 0}
               onClick={() => onStartWorkout(currentDay)}
-              className="flex-1 sm:flex-none px-6 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 text-slate-950 font-black text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl shadow-emerald-500/30 transition-all group"
+              className="flex-1 md:flex-none px-5 sm:px-6 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 text-slate-950 font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/30 transition-all group min-h-[46px]"
             >
               <Play className="w-5 h-5 fill-slate-950 group-hover:scale-110 transition-transform" />
               <span>INICIAR TREINO</span>

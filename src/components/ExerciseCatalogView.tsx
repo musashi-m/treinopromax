@@ -125,26 +125,26 @@ export const ExerciseCatalogView: React.FC<ExerciseCatalogViewProps> = ({
       </div>
 
       {/* Target Day selector & Search */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 sm:top-3" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar por nome, equipamento ou músculo..."
-            className="w-full pl-10 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-sky-500"
+            className="w-full pl-10 pr-4 py-2.5 sm:py-2 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-sky-500"
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col xs:flex-row sm:flex-row items-stretch sm:items-center gap-1.5 sm:gap-2">
           <span className="text-xs text-slate-400 font-semibold whitespace-nowrap">
             Adicionar no dia:
           </span>
           <select
             value={selectedDayToAdd}
             onChange={(e) => setSelectedDayToAdd(e.target.value)}
-            className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs sm:text-sm font-bold text-white focus:outline-none focus:border-sky-500"
+            className="w-full sm:w-auto px-3 py-2.5 sm:py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs sm:text-sm font-bold text-white focus:outline-none focus:border-sky-500"
           >
             {routines.map((r) => (
               <option key={r.id} value={r.id}>

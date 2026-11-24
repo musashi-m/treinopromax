@@ -224,9 +224,9 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
       </div>
 
       {/* Monthly Interactive Calendar Grid */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xl">
+      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl sm:rounded-3xl p-2.5 sm:p-6 shadow-xl">
         {/* Days of Week Header */}
-        <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center text-xs font-bold text-slate-400 uppercase tracking-wider pb-3 border-b border-slate-800">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider pb-2 sm:pb-3 border-b border-slate-800">
           <div>Seg</div>
           <div>Ter</div>
           <div>Qua</div>
@@ -237,10 +237,10 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
         </div>
 
         {/* Calendar Cells */}
-        <div className="grid grid-cols-7 gap-1 sm:gap-2 pt-3">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2 pt-2 sm:pt-3">
           {/* Empty padding slots before 1st of month */}
           {Array.from({ length: startOffset }).map((_, idx) => (
-            <div key={`empty-${idx}`} className="h-16 sm:h-24 rounded-2xl bg-slate-950/20 opacity-30" />
+            <div key={`empty-${idx}`} className="h-14 sm:h-24 rounded-xl sm:rounded-2xl bg-slate-950/20 opacity-30" />
           ))}
 
           {/* Days of Month */}
@@ -256,7 +256,7 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
               <div
                 key={dateStr}
                 onClick={() => setSelectedDateStr(dateStr)}
-                className={`h-16 sm:h-24 p-1 sm:p-2 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between select-none relative group ${
+                className={`h-14 sm:h-24 p-1 sm:p-2 rounded-xl sm:rounded-2xl border transition-all active:scale-95 cursor-pointer flex flex-col justify-between select-none relative group overflow-hidden ${
                   isSelected
                     ? 'border-emerald-400 ring-2 ring-emerald-500/30 bg-slate-850 shadow-lg'
                     : hasWorkout
@@ -267,7 +267,7 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
                 {/* Day Number and Today Marker */}
                 <div className="flex items-center justify-between">
                   <span
-                    className={`text-xs sm:text-sm font-black w-6 h-6 rounded-full flex items-center justify-center ${
+                    className={`text-[11px] sm:text-sm font-black w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center ${
                       isToday
                         ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/30'
                         : hasWorkout
@@ -279,18 +279,18 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
                   </span>
 
                   {hasWorkout && (
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse hidden sm:block" />
+                    <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 animate-pulse" />
                   )}
                 </div>
 
                 {/* Workout tags / indicator */}
                 {hasWorkout ? (
                   <div className="space-y-0.5 overflow-hidden">
-                    <span className="text-[10px] sm:text-[11px] font-bold text-white bg-slate-900/90 px-1.5 py-0.5 rounded border border-emerald-500/30 truncate block text-left">
+                    <span className="text-[9px] sm:text-[11px] font-bold text-white bg-slate-900/90 px-1 sm:px-1.5 py-0.5 rounded border border-emerald-500/30 truncate block text-left">
                       {dayWorkouts[0].muscleSplit}
                     </span>
                     {dayWorkouts.length > 1 && (
-                      <span className="text-[9px] text-emerald-400 font-extrabold block text-left pl-1">
+                      <span className="hidden sm:block text-[9px] text-emerald-400 font-extrabold text-left pl-1">
                         +{dayWorkouts.length - 1} treino(s)
                       </span>
                     )}

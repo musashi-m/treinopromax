@@ -557,7 +557,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0b0f17] text-slate-100 flex flex-col font-sans pb-16 md:pb-0">
+    <div className="min-h-[100dvh] bg-[#0b0f17] text-slate-100 flex flex-col font-sans pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
       {/* Top Navbar */}
       <Navbar
         currentTab={currentTab}

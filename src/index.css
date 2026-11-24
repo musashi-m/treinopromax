@@ -3,9 +3,23 @@
 @tailwind utilities;
 
 @layer base {
+  html,
+  body {
+    overflow-x: hidden;
+    overscroll-behavior-y: contain;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     @apply bg-[#0b0f17] text-slate-100 antialiased selection:bg-emerald-500 selection:text-black;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  button,
+  [role="button"],
+  input,
+  select {
+    touch-action: manipulation;
   }
 
   /* Custom dark scrollbar for gym UI */
@@ -23,6 +37,15 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #10b981;
   }
+}
+
+/* Hide scrollbars on horizontal mobile strips */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Glassmorphism helpers */
