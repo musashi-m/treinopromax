@@ -1,0 +1,412 @@
+import type { BaseExercise, MuscleGroup } from '../types/workout';
+
+export const EXERCISE_LIBRARY: BaseExercise[] = [
+  // --- PEITO ---
+  {
+    id: 'supino-reto-barra',
+    name: 'Supino Reto com Barra',
+    muscleGroup: 'peito',
+    secondaryMuscles: ['triceps', 'ombros'],
+    equipment: 'Barra Olímpica e Banco Reto',
+    gifUrl: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Deite-se no banco, apoie os pés firmes no chão, mantenha as escápulas aduzidas. Desça a barra de forma controlada até a linha do meio do peitoral e empurre com força até estender os braços sem hiperestender os cotovelos.',
+    tips: ['Mantenha os cotovelos a cerca de 45° a 75° em relação ao tronco', 'Nunca tire as escápulas do banco durante a subida', 'Respire fundo na descida e solte na subida'],
+    defaultSets: 4,
+    defaultReps: '8-10',
+    defaultRestSeconds: 90
+  },
+  {
+    id: 'supino-inclinado-halteres',
+    name: 'Supino Inclinado com Halteres',
+    muscleGroup: 'peito',
+    secondaryMuscles: ['ombros', 'triceps'],
+    equipment: 'Halteres e Banco Inclinado 30°/45°',
+    gifUrl: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Ajuste o banco em inclinação de 30 a 45 graus. Erga os halteres até a linha superior do peito, mantendo o controle total da descida para máxima amplitude.',
+    tips: ['Excelente para enfatizar a porção clavicular (superior) do peitoral', 'Alongue bem no final da descida'],
+    defaultSets: 4,
+    defaultReps: '10-12',
+    defaultRestSeconds: 75
+  },
+  {
+    id: 'peck-deck-crucifixo',
+    name: 'Crucifixo na Máquina (Peck Deck)',
+    muscleGroup: 'peito',
+    secondaryMuscles: ['ombros'],
+    equipment: 'Máquina Voador / Peck Deck',
+    gifUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Sente-se com as costas coladas no encosto. Segure as manoplas na altura do peito, feche os braços contraindo o peitoral no ponto máximo e retorne devagar.',
+    tips: ['Mantenha os cotovelos levemente flexionados durante todo o percurso', 'Segure 1 segundo no pico de contração'],
+    defaultSets: 3,
+    defaultReps: '12-15',
+    defaultRestSeconds: 60
+  },
+  {
+    id: 'crossover-polia-media',
+    name: 'Crossover na Polia Média',
+    muscleGroup: 'peito',
+    secondaryMuscles: ['ombros'],
+    equipment: 'Cabo / Polia Dupla',
+    gifUrl: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Dê um passo à frente com tronco levemente inclinado. Puxe os cabos juntando as mãos à frente do peito, focando no aperto muscular.',
+    tips: ['Tensão constante do início ao fim graças aos cabos', 'Cruze levemente os pulsos para contração extra'],
+    defaultSets: 3,
+    defaultReps: '12-15',
+    defaultRestSeconds: 60
+  },
+  {
+    id: 'flexao-de-braco',
+    name: 'Flexão de Braço (Push-Up)',
+    muscleGroup: 'peito',
+    secondaryMuscles: ['triceps', 'abdomen'],
+    equipment: 'Peso Corporal',
+    gifUrl: 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Apoie as mãos um pouco mais largas que os ombros, mantenha o abdômen contraído em linha reta. Desça até quase tocar o peito no chão e empurre.',
+    tips: ['Não deixe o quadril cair', 'Ótimo finalizador para esgotar as fibras do peitoral'],
+    defaultSets: 3,
+    defaultReps: 'Falha (15-20)',
+    defaultRestSeconds: 60
+  },
+
+  // --- COSTAS ---
+  {
+    id: 'puxada-frontal-pulley',
+    name: 'Puxada Frontal Aberta (Pulley)',
+    muscleGroup: 'costas',
+    secondaryMuscles: ['biceps', 'ombros'],
+    equipment: 'Máquina Puxador Pulley',
+    gifUrl: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Segure a barra com pegada pronada aberta. Puxe a barra em direção à parte superior do peito puxando pelos cotovelos e expandindo o peito.',
+    tips: ['Inicie o movimento deprimindo as escápulas antes de dobrar os braços', 'Não jogue o tronco excessivamente para trás'],
+    defaultSets: 4,
+    defaultReps: '10-12',
+    defaultRestSeconds: 90
+  },
+  {
+    id: 'remada-curvada-barra',
+    name: 'Remada Curvada com Barra',
+    muscleGroup: 'costas',
+    secondaryMuscles: ['biceps', 'posterior'],
+    equipment: 'Barra e Anilhas',
+    gifUrl: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Incline o tronco a cerca de 45° mantendo a lombar firme e travada. Puxe a barra em direção ao umbigo puxando os cotovelos para trás.',
+    tips: ['Mantenha a coluna neutra para proteger a região lombar', 'Aperte as dorsais no ponto alto'],
+    defaultSets: 4,
+    defaultReps: '8-10',
+    defaultRestSeconds: 90
+  },
+  {
+    id: 'remada-baixa-triangulo',
+    name: 'Remada Baixa no Triângulo',
+    muscleGroup: 'costas',
+    secondaryMuscles: ['biceps'],
+    equipment: 'Polia Baixa com Puxador Triângulo',
+    gifUrl: 'https://images.unsplash.com/photo-1534367507873-d2d7e24c797f?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Sente-se com joelhos levemente flexionados. Puxe o triângulo até o abdômen retraindo fortemente as escápulas e alongue bem na volta.',
+    tips: ['Não balance o tronco em excesso', 'Concentre o esforço nas costas e não nos bíceps'],
+    defaultSets: 3,
+    defaultReps: '10-12',
+    defaultRestSeconds: 75
+  },
+  {
+    id: 'pulldown-corda',
+    name: 'Pulldown na Polia Alta com Corda',
+    muscleGroup: 'costas',
+    secondaryMuscles: ['triceps'],
+    equipment: 'Cabo com Corda',
+    gifUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Afaste-se do cabo, incline o tronco à frente. Com braços quase retos, empurre a corda para baixo em direção às coxas abrindo as pontas no final.',
+    tips: ['Isolador fantástico para o grande dorsal (asas)', 'Mantenha os cotovelos fixos'],
+    defaultSets: 3,
+    defaultReps: '12-15',
+    defaultRestSeconds: 60
+  },
+  {
+    id: 'levantamento-terra',
+    name: 'Levantamento Terra (Deadlift)',
+    muscleGroup: 'costas',
+    secondaryMuscles: ['pernas', 'gluteos', 'posterior'],
+    equipment: 'Barra Olímpica e Anilhas',
+    gifUrl: 'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Pés na largura do quadril, segure a barra firme. Estenda quadril e joelhos ao mesmo tempo, levantando a carga com coluna ereta e travada.',
+    tips: ['Exercício composto de força máxima', 'A barra deve subir rente às canelas e coxas', 'Respire fundo e trave o abdômen antes de erguer'],
+    defaultSets: 3,
+    defaultReps: '5-8',
+    defaultRestSeconds: 120
+  },
+
+  // --- PERNAS & QUADRÍCEPS ---
+  {
+    id: 'agachamento-livre',
+    name: 'Agachamento Livre com Barra',
+    muscleGroup: 'pernas',
+    secondaryMuscles: ['quadriceps', 'gluteos', 'abdomen'],
+    equipment: 'Barra Olímpica e Gaiola de Agachamento',
+    gifUrl: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Apoie a barra no trapézio, pés na largura dos ombros apontados levemente para fora. Desça flexionando quadril e joelhos mantendo o peito erguido até pelo menos 90 graus.',
+    tips: ['Joelhos acompanham a ponta dos pés', 'Não deixe os joelhos desabarem para dentro (valgo dinâmico)', 'Mantenha os calcanhares colados no chão'],
+    defaultSets: 4,
+    defaultReps: '8-10',
+    defaultRestSeconds: 120
+  },
+  {
+    id: 'leg-press-45',
+    name: 'Leg Press 45°',
+    muscleGroup: 'pernas',
+    secondaryMuscles: ['quadriceps', 'gluteos'],
+    equipment: 'Aparelho Leg Press 45',
+    gifUrl: 'https://images.unsplash.com/photo-1434682881908-b0740ac39474?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Apoie os pés na plataforma na largura dos ombros. Destrave a máquina e desça a plataforma trazendo os joelhos em direção ao peito sem descolar a lombar do banco.',
+    tips: ['Nunca estenda os joelhos até travar a articulação', 'Empurre a força pelos calcanhares'],
+    defaultSets: 4,
+    defaultReps: '10-12',
+    defaultRestSeconds: 90
+  },
+  {
+    id: 'cadeira-extensora',
+    name: 'Cadeira Extensora',
+    muscleGroup: 'pernas',
+    secondaryMuscles: ['quadriceps'],
+    equipment: 'Máquina Extensora',
+    gifUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Ajuste o rolo logo acima dos tornozelos. Estenda as pernas até a contração total do quadríceps, segure 1 segundo no topo e desça controlando.',
+    tips: ['Isolamento puro de quadríceps', 'Evite dar impulso ou levantar o quadril do assento'],
+    defaultSets: 4,
+    defaultReps: '12-15',
+    defaultRestSeconds: 60
+  },
+  {
+    id: 'avanco-passada',
+    name: 'Avanço / Passada com Halteres',
+    muscleGroup: 'pernas',
+    secondaryMuscles: ['gluteos', 'quadriceps'],
+    equipment: 'Par de Halteres',
+    gifUrl: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Dê um passo à frente flexionando ambos os joelhos em 90 graus. O joelho de trás quase encosta no chão. Empurre com o calcanhar da frente para avançar.',
+    tips: ['Mantenha o tronco alinhado', 'Exercício unilateral excelente para equilíbrio e hipertrofia'],
+    defaultSets: 3,
+    defaultReps: '10 a 12 passos cada perna',
+    defaultRestSeconds: 75
+  },
+
+  // --- POSTERIOR & GLÚTEOS ---
+  {
+    id: 'mesa-flexora',
+    name: 'Mesa Flexora',
+    muscleGroup: 'posterior',
+    secondaryMuscles: ['gluteos'],
+    equipment: 'Máquina Mesa Flexora',
+    gifUrl: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Deite-se de bruços com o rolo posicionado atrás dos tornozelos. Puxe os calcanhares em direção aos glúteos e controle a volta sem deixar o peso bater.',
+    tips: ['Mantenha a pelve pressionada contra o banco para isolar os isquiotibiais', 'Não dê solavancos'],
+    defaultSets: 4,
+    defaultReps: '10-12',
+    defaultRestSeconds: 75
+  },
+  {
+    id: 'stiff-barra',
+    name: 'Stiff com Barra ou Halteres',
+    muscleGroup: 'posterior',
+    secondaryMuscles: ['gluteos', 'costas'],
+    equipment: 'Barra ou Halteres',
+    gifUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Com joelhos semi-flexionados e travados, empurre o quadril para trás enquanto desce o tronco com a coluna reta até sentir o posterior alongar ao máximo.',
+    tips: ['O movimento parte do quadril e não da curvatura da coluna', 'Sinta a tração e o alongamento dos posteriores'],
+    defaultSets: 4,
+    defaultReps: '10-12',
+    defaultRestSeconds: 90
+  },
+  {
+    id: 'elevacao-pelvica',
+    name: 'Elevação Pélvica com Barra',
+    muscleGroup: 'gluteos',
+    secondaryMuscles: ['posterior'],
+    equipment: 'Barra com Protetor e Banco',
+    gifUrl: 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Apoie a parte superior das costas no banco, barra sobre o quadril com almofada. Empurre pelos calcanhares subindo o quadril até ficar paralelo ao chão.',
+    tips: ['Aperte os glúteos por 2 segundos no topo de cada repetição', 'Mantenha o queixo apontado para frente'],
+    defaultSets: 4,
+    defaultReps: '10-12',
+    defaultRestSeconds: 90
+  },
+
+  // --- OMBROS ---
+  {
+    id: 'desenvolvimento-halteres',
+    name: 'Desenvolvimento com Halteres',
+    muscleGroup: 'ombros',
+    secondaryMuscles: ['triceps'],
+    equipment: 'Halteres e Banco 75°/90°',
+    gifUrl: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Sente-se com as costas apoiadas. Segure os halteres na altura das orelhas e empurre para cima em arco até quase se tocarem acima da cabeça.',
+    tips: ['Mantenha os cotovelos levemente apontados para frente', 'Construção maciça para os deltóides'],
+    defaultSets: 4,
+    defaultReps: '8-10',
+    defaultRestSeconds: 90
+  },
+  {
+    id: 'elevacao-lateral-halteres',
+    name: 'Elevação Lateral com Halteres',
+    muscleGroup: 'ombros',
+    secondaryMuscles: [],
+    equipment: 'Halteres',
+    gifUrl: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Em pé ou sentado, erga os halteres lateralmente até a altura dos ombros com os cotovelos levemente flexionados e desça devagar.',
+    tips: ['Lidere a subida pelos cotovelos e não pelas mãos', 'Evite usar impulso do tronco para erguer o peso'],
+    defaultSets: 4,
+    defaultReps: '12-15',
+    defaultRestSeconds: 60
+  },
+  {
+    id: 'crucifixo-invertido-polia',
+    name: 'Crucifixo Invertido na Polia / Peck Deck',
+    muscleGroup: 'ombros',
+    secondaryMuscles: ['costas'],
+    equipment: 'Polia ou Aparelho Peck Deck Invertido',
+    gifUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Ajuste os braços do aparelho. Puxe para trás focando exclusivamente no deltóide posterior, sem dar trancos com as costas.',
+    tips: ['Fundamental para a postura e para a visão tridimensional dos ombros'],
+    defaultSets: 3,
+    defaultReps: '12-15',
+    defaultRestSeconds: 60
+  },
+
+  // --- BÍCEPS ---
+  {
+    id: 'rosca-direta-barra-w',
+    name: 'Rosca Direta com Barra W',
+    muscleGroup: 'biceps',
+    secondaryMuscles: [],
+    equipment: 'Barra W e Anilhas',
+    gifUrl: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Em pé, segure a barra W na curvatura ergonômica. Mantendo os cotovelos colados ao corpo, flexione os braços subindo a barra e desça sem balançar.',
+    tips: ['A barra W poupa a articulação dos punhos', 'Mantenha o corpo estável e não use a lombar como pêndulo'],
+    defaultSets: 4,
+    defaultReps: '10-12',
+    defaultRestSeconds: 75
+  },
+  {
+    id: 'rosca-martelo-halteres',
+    name: 'Rosca Martelo com Halteres',
+    muscleGroup: 'biceps',
+    secondaryMuscles: ['geral'],
+    equipment: 'Par de Halteres',
+    gifUrl: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Segure os halteres com as palmas voltadas uma para a outra (pegada neutra). Suba o halter mantendo a pegada e sinta o braquial e antebraço.',
+    tips: ['Excelente para densidade do braço e força de pegada'],
+    defaultSets: 3,
+    defaultReps: '10-12',
+    defaultRestSeconds: 60
+  },
+  {
+    id: 'rosca-scott-maquina',
+    name: 'Rosca Scott na Máquina / Banco',
+    muscleGroup: 'biceps',
+    secondaryMuscles: [],
+    equipment: 'Banco Scott ou Máquina',
+    gifUrl: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Apoie as axilas firmes na borda do banco Scott. Puxe a carga isolando totalmente a cabeça curta do bíceps sem descolar os braços do estofado.',
+    tips: ['Não solte o peso de uma vez no final da descida para proteger o tendão'],
+    defaultSets: 3,
+    defaultReps: '10-12',
+    defaultRestSeconds: 60
+  },
+
+  // --- TRÍCEPS ---
+  {
+    id: 'triceps-corda-polia',
+    name: 'Tríceps Corda na Polia Alta',
+    muscleGroup: 'triceps',
+    secondaryMuscles: [],
+    equipment: 'Polia Alta com Corda',
+    gifUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Segure a corda com cotovelos colados ao lado das costelas. Estenda os braços para baixo e abra as extremidades da corda no final para pico de contração.',
+    tips: ['Mantenha os cotovelos parados no espaço', 'Segure 1 segundo no bloqueio'],
+    defaultSets: 4,
+    defaultReps: '12-15',
+    defaultRestSeconds: 60
+  },
+  {
+    id: 'triceps-testa-barra-w',
+    name: 'Tríceps Testa com Barra W',
+    muscleGroup: 'triceps',
+    secondaryMuscles: [],
+    equipment: 'Banco Reto e Barra W',
+    gifUrl: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Deitado no banco, eleve a barra com braços estendidos. Dobre apenas os cotovelos trazendo a barra suavemente em direção à testa/topo da cabeça e empurre.',
+    tips: ['Grande estímulo para a cabeça longa do tríceps', 'Não abra os cotovelos para os lados'],
+    defaultSets: 3,
+    defaultReps: '10-12',
+    defaultRestSeconds: 75
+  },
+  {
+    id: 'triceps-frances-halter',
+    name: 'Tríceps Francês com Halter',
+    muscleGroup: 'triceps',
+    secondaryMuscles: [],
+    equipment: 'Halter e Banco',
+    gifUrl: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Segure um halter com ambas as mãos atrás da cabeça. Estenda os antebraços erguendo o peso até quase estender os cotovelos e desça controlando.',
+    tips: ['Alongamento profundo na cabeça longa do tríceps'],
+    defaultSets: 3,
+    defaultReps: '10-12',
+    defaultRestSeconds: 60
+  },
+
+  // --- ABDÔMEN & PANTURRILHA ---
+  {
+    id: 'abdominal-infra-paralela',
+    name: 'Elevação de Pernas na Paralela (Infra)',
+    muscleGroup: 'abdomen',
+    secondaryMuscles: [],
+    equipment: 'Barras Paralelas ou Torre de Abdominal',
+    gifUrl: 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Apoie os antebraços nas almofadas, coluna bem encostada. Erga os joelhos ou pernas em direção ao peito enrolando o quadril.',
+    tips: ['Enrole a bacia no topo e não levante apenas com os flexores do quadril'],
+    defaultSets: 3,
+    defaultReps: '15-20',
+    defaultRestSeconds: 60
+  },
+  {
+    id: 'prancha-isometrica',
+    name: 'Prancha Isométrica',
+    muscleGroup: 'abdomen',
+    secondaryMuscles: ['ombros'],
+    equipment: 'Colchonete / Solo',
+    gifUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Apoie os antebraços e pontas dos pés no solo. Mantenha corpo reto como uma prancha, glúteos e abdômen apertados sem desabar a lombar.',
+    tips: ['Respire ritmadamente', 'Foco em estabilidade e proteção da coluna vertebral'],
+    defaultSets: 3,
+    defaultReps: '45-60 segundos',
+    defaultRestSeconds: 60
+  },
+  {
+    id: 'panturrilha-em-pe',
+    name: 'Panturrilha em Pé na Máquina / Degrau',
+    muscleGroup: 'panturrilha',
+    secondaryMuscles: [],
+    equipment: 'Máquina de Panturrilha em Pé ou Degrau',
+    gifUrl: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&auto=format&fit=crop&q=80',
+    instructions: 'Ponta dos pés apoiada na beirada, desça os calcanhares para alongar a fáscia e empurre subindo o máximo na ponta dos pés.',
+    tips: ['Segure 2 segundos no pico da contração no topo', 'Desça bem devagar para eliminar a elasticidade do tendão de Aquiles'],
+    defaultSets: 4,
+    defaultReps: '15-20',
+    defaultRestSeconds: 60
+  }
+];
+
+export const MUSCLE_GROUP_LABELS: Record<MuscleGroup, { label: string; color: string; badgeBg: string }> = {
+  peito: { label: 'Peitoral', color: '#f43f5e', badgeBg: 'bg-rose-500/20 text-rose-400 border-rose-500/30' },
+  costas: { label: 'Costas / Dorsal', color: '#0ea5e9', badgeBg: 'bg-sky-500/20 text-sky-400 border-sky-500/30' },
+  pernas: { label: 'Pernas / Quadríceps', color: '#10b981', badgeBg: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
+  quadriceps: { label: 'Quadríceps', color: '#10b981', badgeBg: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
+  posterior: { label: 'Posterior / Isquiotibiais', color: '#8b5cf6', badgeBg: 'bg-violet-500/20 text-violet-400 border-violet-500/30' },
+  gluteos: { label: 'Glúteos', color: '#ec4899', badgeBg: 'bg-pink-500/20 text-pink-400 border-pink-500/30' },
+  ombros: { label: 'Ombros / Deltoides', color: '#f59e0b', badgeBg: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
+  biceps: { label: 'Bíceps', color: '#06b6d4', badgeBg: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' },
+  triceps: { label: 'Tríceps', color: '#eab308', badgeBg: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
+  abdomen: { label: 'Abdômen / Core', color: '#14b8a6', badgeBg: 'bg-teal-500/20 text-teal-400 border-teal-500/30' },
+  panturrilha: { label: 'Panturrilhas', color: '#84cc16', badgeBg: 'bg-lime-500/20 text-lime-400 border-lime-500/30' },
+  cardio: { label: 'Cardio / Aeróbico', color: '#ef4444', badgeBg: 'bg-red-500/20 text-red-400 border-red-500/30' },
+  geral: { label: 'Geral', color: '#94a3b8', badgeBg: 'bg-slate-500/20 text-slate-400 border-slate-500/30' },
+};
