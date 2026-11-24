@@ -5,14 +5,17 @@
 @layer base {
   html,
   body {
-    overflow-x: hidden;
-    overscroll-behavior-y: contain;
     -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: auto;
   }
 
   body {
     @apply bg-[#0b0f17] text-slate-100 antialiased selection:bg-emerald-500 selection:text-black;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  #root {
+    overflow-x: clip;
   }
 
   button,
