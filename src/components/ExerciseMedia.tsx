@@ -11,6 +11,7 @@ interface ExerciseMediaProps {
   className?: string;
   onUpdateGifUrl?: (newUrl: string) => void;
   showExpandButton?: boolean;
+  compact?: boolean;
 }
 
 export const ExerciseMedia: React.FC<ExerciseMediaProps> = ({
@@ -21,6 +22,7 @@ export const ExerciseMedia: React.FC<ExerciseMediaProps> = ({
   className = '',
   onUpdateGifUrl,
   showExpandButton = true,
+  compact = false,
 }) => {
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,30 +45,61 @@ export const ExerciseMedia: React.FC<ExerciseMediaProps> = ({
     <>
       <div className={`relative overflow-hidden rounded-xl bg-slate-900 border border-slate-800 group ${className}`}>
         {/* Loading skeleton */}
-        {isLoading && !hasError && (
-          <div className="absolute inset-0 bg-slate-800/80 animate-pulse flex flex-col items-center justify-center text-slate-400 gap-2 z-10">
-            <Dumbbell className="w-8 h-8 animate-spin text-emerald-400" />
-            <span className="text-xs font-medium">Carregando execução...</span>
+        {isLoading && !hasError && gifUrl && (
+          <div className="absolute inset-0 bg-slate-800/80 animate-pulse flex flex-col items-center justify-center text-slate-400 gap-1 z-10">
+            <Dumbbell className={`${compact ? 'w-5 h-5' : 'w-8 h-8'} animate-spin text-emerald-400`} />
+            {!compact && <span className="text-xs font-medium">Carregando execução...</span>}
           </div>
         )}
 
         {/* Fallback Graphic if image fails or no URL */}
         {(!gifUrl || hasError) ? (
-          <div className="w-full h-full min-h-[160px] flex flex-col items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-slate-850 to-slate-800 text-center select-none">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-2 shadow-lg shadow-emerald-500/10">
-              <Dumbbell className="w-7 h-7 text-emerald-400 animate-pulse" />
-            </div>
-            <span className="text-sm font-bold text-slate-200">{name}</span>
-            <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full mt-1 border ${muscleMeta.badgeBg}`}>
-              {muscleMeta.label}
-            </span>
+          compact ? (
             <button
               type="button"
               onClick={() => setIsEditingUrl(true)}
-              className="mt-3 text-xs text-emerald-400 hover:text-emerald-300 underline flex items-center gap-1"
+              className="w-full h-full flex flex-col items-center justify-center p-2 bg-slate-900 text-center select-none hover:bg-slate-800 transition-colors"
+              title="Adicionar / Trocar GIF"
             >
-              <ImageIcon className="w-3.5 h-3.5" /> Adicionar / Trocar GIF
+              <Dumbbell className="w-6 h-6 text-emerald-400 mb-1" />
+              <span className="text-[10px] font-bold text-emerald-400 leading-tight">Add GIF</span>
             </button>
+          ) : (
+            <div className="w-full h-full min-h-[160px] flex flex-col items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-slate-850 to-slate-800 text-center select-none">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-2 shadow-lg shadow-emerald-500/10">
+                <Dumbbell className="w-7 h-7 text-emerald-400 animate-pulse" />
+              </div>
+              <span className="text-sm font-bold text-slate-200">{name}</span>
+              <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full mt-1 border ${muscleMeta.badgeBg}`}>
+                {muscleMeta.label}
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsEditingUrl(true)}
+                className="mt-3 text-xs text-emerald-400 hover:text-emerald-300 underline flex items-center gap-1"
+              >
+                <ImageIcon className="w-3.5 h-3.5" /> Adicionar / Trocar GIF
+              </button>
+            </div>
+          )
+        ) : compact ? (
+          /* Clean unobstructed thumbnail for mobile & routine cards */
+          <div
+            onClick={() => showExpandButton && setIsModalOpen(true)}
+            className="relative w-full h-full cursor-pointer bg-slate-950"
+            title="Toque para ampliar o GIF"
+          >
+            <img
+              src={gifUrl}
+              alt={`Execução de ${name}`}
+              className="w-full h-full object-cover"
+              loading="lazy"
+              onLoad={() => setIsLoading(false)}
+              onError={() => {
+                setIsLoading(false);
+                setHasError(true);
+              }}
+            />
           </div>
         ) : (
           <div className="relative w-full h-full">
@@ -81,15 +114,8 @@ export const ExerciseMedia: React.FC<ExerciseMediaProps> = ({
                 setHasError(true);
               }}
             />
-            {/* Dark gradient overlay for contrast */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
-
-            {/* Top Tag */}
-            <div className="absolute top-2 left-2 z-20">
-              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md backdrop-blur-md border ${muscleMeta.badgeBg}`}>
-                {muscleMeta.label}
-              </span>
-            </div>
+            {/* Subtle bottom gradient for action buttons only */}
+            <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />
 
             {/* Action overlay buttons */}
             <div className="absolute bottom-2 right-2 flex items-center gap-1 z-20">
@@ -194,19 +220,34 @@ export const ExerciseMedia: React.FC<ExerciseMediaProps> = ({
             className="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full overflow-hidden shadow-2xl animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between gap-2">
               <div>
                 <h3 className="text-lg font-black text-white">{name}</h3>
                 <span className={`text-xs px-2 py-0.5 rounded-full border ${muscleMeta.badgeBg}`}>
                   {muscleMeta.label}
                 </span>
               </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-1.5">
+                {onUpdateGifUrl && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      setIsEditingUrl(true);
+                    }}
+                    className="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-emerald-400 flex items-center gap-1.5"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>Trocar GIF</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             <div className="relative bg-black flex items-center justify-center min-h-[260px] max-h-[380px] overflow-hidden">

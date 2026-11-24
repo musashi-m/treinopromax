@@ -23,7 +23,6 @@ export const ExerciseLibraryModal: React.FC<ExerciseLibraryModalProps> = ({
   // Custom exercise form state
   const [customName, setCustomName] = useState('');
   const [customMuscle, setCustomMuscle] = useState<MuscleGroup>('peito');
-  const [customEquipment] = useState('Halteres / Barra');
   const [customGifUrl, setCustomGifUrl] = useState('');
   const [customInstructions, setCustomInstructions] = useState('');
   const [customSets, setCustomSets] = useState(4);
@@ -76,7 +75,7 @@ export const ExerciseLibraryModal: React.FC<ExerciseLibraryModalProps> = ({
       targetSets: customSets,
       targetReps: customReps,
       restSeconds: customRest,
-      notes: customEquipment,
+      notes: undefined,
       lastWeight: undefined,
       lastReps: undefined,
     };

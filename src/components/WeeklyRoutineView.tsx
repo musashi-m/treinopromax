@@ -300,8 +300,8 @@ export const WeeklyRoutineView: React.FC<WeeklyRoutineViewProps> = ({
                 >
                   {/* Left: GIF / Visual and Details */}
                   <div className="flex items-center gap-4 flex-1">
-                    {/* Media Thumbnail with GIF */}
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 flex-shrink-0 relative group/media">
+                    {/* Media Thumbnail with GIF (clean unobstructed mobile thumbnail) */}
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 flex-shrink-0 relative group/media">
                       <ExerciseMedia
                         gifUrl={ex.gifUrl}
                         name={ex.name}
@@ -309,6 +309,7 @@ export const WeeklyRoutineView: React.FC<WeeklyRoutineViewProps> = ({
                         instructions={ex.instructions}
                         className="w-full h-full"
                         showExpandButton={true}
+                        compact={true}
                         onUpdateGifUrl={(newUrl) => {
                           const updated = { ...ex, gifUrl: newUrl };
                           handleSaveEditedExercise(updated);
@@ -342,7 +343,7 @@ export const WeeklyRoutineView: React.FC<WeeklyRoutineViewProps> = ({
                           <Clock className="w-3.5 h-3.5 text-emerald-400" />
                           Descanso: <strong className="text-slate-200">{ex.restSeconds}s</strong>
                         </span>
-                        {ex.notes && (
+                        {ex.notes && ex.notes !== 'Halteres / Barra' && (
                           <>
                             <span>•</span>
                             <span className="text-slate-500 truncate max-w-xs">{ex.notes}</span>
