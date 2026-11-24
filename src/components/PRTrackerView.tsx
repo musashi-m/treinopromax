@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trophy, Search, Calculator, Plus, X } from 'lucide-react';
+import { Trophy, Search, Calculator, Plus, X, Trash2 } from 'lucide-react';
 import type { PersonalRecord, MuscleGroup } from '../types/workout';
 import { MUSCLE_GROUP_LABELS, EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import { calculate1RM, formatDateBR } from '../utils/calc';
@@ -7,11 +7,15 @@ import { calculate1RM, formatDateBR } from '../utils/calc';
 interface PRTrackerViewProps {
   prs: PersonalRecord[];
   onAddOrUpdatePR: (pr: PersonalRecord) => void;
+  onDeletePR?: (pr: PersonalRecord) => void;
+  onClearAllPRs?: () => void;
 }
 
 export const PRTrackerView: React.FC<PRTrackerViewProps> = ({
   prs,
   onAddOrUpdatePR,
+  onDeletePR,
+  onClearAllPRs,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMuscle, setSelectedMuscle] = useState<MuscleGroup | 'todos'>('todos');
@@ -81,13 +85,28 @@ export const PRTrackerView: React.FC<PRTrackerViewProps> = ({
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsAddModalOpen(true)}
-            className="px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all self-start sm:self-auto"
-          >
-            <Plus className="w-4 h-4" /> Registrar Novo PR
-          </button>
+          <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+            {prs.length > 0 && onClearAllPRs && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm('Deseja limpar todos os recordes pessoais (PRs)?')) {
+                    onClearAllPRs();
+                  }
+                }}
+                className="px-4 py-3 rounded-2xl bg-slate-800 hover:bg-red-500/20 text-slate-300 hover:text-red-400 border border-slate-700 hover:border-red-500/30 font-bold text-xs flex items-center gap-1.5 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" /> Limpar PRs
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setIsAddModalOpen(true)}
+              className="px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all"
+            >
+              <Plus className="w-4 h-4" /> Registrar Novo PR
+            </button>
+          </div>
         </div>
       </div>
 
@@ -194,7 +213,19 @@ export const PRTrackerView: React.FC<PRTrackerViewProps> = ({
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${muscleMeta.badgeBg}`}>
                       {muscleMeta.label}
                     </span>
-                    <span className="text-[11px] text-slate-500">{formatDateBR(pr.date)}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-slate-500">{formatDateBR(pr.date)}</span>
+                      {onDeletePR && (
+                        <button
+                          type="button"
+                          onClick={() => onDeletePR(pr)}
+                          className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                          title="Excluir este PR"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <h4 className="text-base font-black text-white group-hover:text-amber-400 transition-colors">

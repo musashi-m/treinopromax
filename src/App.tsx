@@ -69,11 +69,31 @@ export const App: React.FC = () => {
     return EXERCISE_LIBRARY;
   });
 
+  const isLegacyMockPR = (pr?: PersonalRecord): boolean => {
+    return !!pr && typeof pr.date === 'string' && pr.date.startsWith('2026-11-24T19:02:');
+  };
+
+  const sanitizeRoutines = (list: DayRoutine[]): DayRoutine[] => {
+    return list.map((day) => ({
+      ...day,
+      exercises: day.exercises.map((ex) => {
+        if (isLegacyMockPR(ex.currentPR)) {
+          const cleaned = { ...ex };
+          delete cleaned.currentPR;
+          delete cleaned.lastWeight;
+          delete cleaned.lastReps;
+          return cleaned;
+        }
+        return ex;
+      }),
+    }));
+  };
+
   // State: Routines (Weekly Days - clean empty start, no mock workouts)
   const [routines, setRoutines] = useState<DayRoutine[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.ROUTINES);
-      if (saved) return JSON.parse(saved);
+      if (saved) return sanitizeRoutines(JSON.parse(saved));
     } catch (e) {
       console.error('Error loading routines from localStorage', e);
     }
@@ -84,7 +104,12 @@ export const App: React.FC = () => {
   const [prs, setPRs] = useState<PersonalRecord[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.PRS);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.filter((p: PersonalRecord) => !isLegacyMockPR(p));
+        }
+      }
     } catch (e) {
       console.error('Error loading PRs from localStorage', e);
     }
@@ -124,10 +149,10 @@ export const App: React.FC = () => {
   }) => {
     skipNextCloudSyncRef.current = true;
     if (Array.isArray(cloudData.routines) && cloudData.routines.length > 0) {
-      setRoutines(cloudData.routines);
+      setRoutines(sanitizeRoutines(cloudData.routines));
     }
     if (Array.isArray(cloudData.prs)) {
-      setPRs(cloudData.prs);
+      setPRs(cloudData.prs.filter((p) => !isLegacyMockPR(p)));
     }
     if (Array.isArray(cloudData.history)) {
       setHistory(cloudData.history.filter((w) => !w.id.startsWith('seed-workout')));
@@ -637,6 +662,43 @@ export const App: React.FC = () => {
           <PRTrackerView
             prs={prs}
             onAddOrUpdatePR={handleUpdatePR}
+            onDeletePR={(prToDelete) => {
+              setPRs((prev) =>
+                prev.filter(
+                  (p) =>
+                    !(
+                      p.exerciseName.toLowerCase() === prToDelete.exerciseName.toLowerCase() &&
+                      p.date === prToDelete.date
+                    )
+                )
+              );
+              setRoutines((prev) =>
+                prev.map((day) => ({
+                  ...day,
+                  exercises: day.exercises.map((ex) => {
+                    if (ex.name.toLowerCase() === prToDelete.exerciseName.toLowerCase()) {
+                      const cleaned = { ...ex };
+                      delete cleaned.currentPR;
+                      return cleaned;
+                    }
+                    return ex;
+                  }),
+                }))
+              );
+            }}
+            onClearAllPRs={() => {
+              setPRs([]);
+              setRoutines((prev) =>
+                prev.map((day) => ({
+                  ...day,
+                  exercises: day.exercises.map((ex) => {
+                    const cleaned = { ...ex };
+                    delete cleaned.currentPR;
+                    return cleaned;
+                  }),
+                }))
+              );
+            }}
           />
         ) : currentTab === 'historico' ? (
           <HistoryView
