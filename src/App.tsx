@@ -17,6 +17,7 @@ import { HistoryView } from './components/HistoryView';
 import { ExerciseCatalogView } from './components/ExerciseCatalogView';
 import { LoginScreen } from './components/LoginScreen';
 import { BiometricsEnrollModal } from './components/BiometricsEnrollModal';
+import { InstallPwaBanner } from './components/InstallPwaBanner';
 import { supabase, MASTER_USER, syncUserDataToSupabase, fetchUserDataFromSupabase } from './lib/supabase';
 
 const STORAGE_KEYS = {
@@ -558,6 +559,9 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-[100dvh] bg-[#0b0f17] text-slate-100 flex flex-col font-sans pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
+      {/* PWA Install Prompt on Android */}
+      <InstallPwaBanner />
+
       {/* Top Navbar */}
       <Navbar
         currentTab={currentTab}

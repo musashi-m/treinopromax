@@ -8,7 +8,10 @@ import {
   isBiometricsAvailable, 
   registerBiometricPasskey, 
   authenticateWithBiometrics, 
-  getStoredPasskey 
+  getStoredPasskey,
+  getStoredQuickPin,
+  registerQuickPin,
+  authenticateWithQuickPin,
 } from '../utils/webauthn';
 
 interface LoginScreenProps {
@@ -22,6 +25,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [hasPasskey, setHasPasskey] = useState(false);
+  const [hasQuickPin, setHasQuickPin] = useState(false);
+  const [showPinSetup, setShowPinSetup] = useState(false);
+  const [showPinLogin, setShowPinLogin] = useState(false);
+  const [quickPinInput, setQuickPinInput] = useState('');
   const [supportsBiometrics, setSupportsBiometrics] = useState(false);
   const [isRegisteringBiometrics, setIsRegisteringBiometrics] = useState(false);
 
@@ -31,6 +38,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
       setSupportsBiometrics(avail);
       const stored = getStoredPasskey();
       setHasPasskey(!!stored);
+      setHasQuickPin(!!getStoredQuickPin());
     }
     checkBiometrics();
   }, []);
@@ -135,12 +143,59 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         setTimeout(() => setSuccessMessage(null), 4000);
       } else {
         setErrorMessage(res.error || 'Não foi possível cadastrar a biometria.');
+        if (res.isCredentialManagerError) {
+          setShowPinSetup(true);
+        }
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setErrorMessage(msg);
     } finally {
       setIsRegisteringBiometrics(false);
+    }
+  };
+
+  // Register Quick PIN fallback
+  const handleRegisterQuickPin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    const targetEmail = email.trim() || MASTER_USER.email;
+    const res = await registerQuickPin(targetEmail, quickPinInput.trim());
+    if (res.success) {
+      setHasQuickPin(true);
+      setShowPinSetup(false);
+      setQuickPinInput('');
+      setSuccessMessage('PIN Rápido cadastrado neste aparelho! Agora você pode entrar só com o PIN.');
+      setTimeout(() => setSuccessMessage(null), 4000);
+    } else {
+      setErrorMessage(res.error || 'Erro ao salvar PIN.');
+    }
+  };
+
+  // Login with Quick PIN
+  const handleQuickPinLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrorMessage(null);
+    try {
+      const res = await authenticateWithQuickPin(quickPinInput.trim());
+      if (!res.success) {
+        setErrorMessage(res.error || 'PIN incorreto.');
+        setIsLoading(false);
+        return;
+      }
+      const targetEmail = res.email || MASTER_USER.email;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: targetEmail,
+        password: MASTER_USER.password,
+      });
+      if (!error && data?.user) {
+        onLoginSuccess({ email: data.user.email || targetEmail, id: data.user.id });
+      } else {
+        onLoginSuccess({ email: targetEmail });
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -203,21 +258,60 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           </div>
         )}
 
-        {/* Biometrics Login Action (Face ID, Touch ID, Windows Hello) */}
-        {supportsBiometrics && (
-          <div className="mb-5">
-            <button
-              type="button"
-              disabled={isLoading}
-              onClick={handleBiometricLogin}
-              className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-500/20 via-slate-800 to-emerald-500/20 hover:from-emerald-500/30 hover:to-emerald-500/30 active:scale-95 text-white font-black text-xs sm:text-sm border border-emerald-500/40 flex items-center justify-center gap-2.5 shadow-lg shadow-emerald-500/10 transition-all group"
-            >
-              <Fingerprint className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
-              <span>Entrar com Biometria / Chave de Acesso</span>
-            </button>
-            <p className="text-[10px] text-slate-500 text-center mt-1.5">
-              Windows Hello, Touch ID, Face ID ou impressão digital
-            </p>
+        {/* Biometrics / Quick PIN Login Actions */}
+        {(supportsBiometrics || hasQuickPin) && (
+          <div className="mb-5 space-y-2.5">
+            {supportsBiometrics && (
+              <div>
+                <button
+                  type="button"
+                  disabled={isLoading}
+                  onClick={handleBiometricLogin}
+                  className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-500/20 via-slate-800 to-emerald-500/20 hover:from-emerald-500/30 hover:to-emerald-500/30 active:scale-95 text-white font-black text-xs sm:text-sm border border-emerald-500/40 flex items-center justify-center gap-2.5 shadow-lg shadow-emerald-500/10 transition-all group min-h-[48px]"
+                >
+                  <Fingerprint className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                  <span>Entrar com Biometria / Chave de Acesso</span>
+                </button>
+                <p className="text-[10px] text-slate-500 text-center mt-1.5">
+                  Windows Hello, Touch ID, Face ID ou impressão digital
+                </p>
+              </div>
+            )}
+
+            {hasQuickPin && (
+              <div>
+                {!showPinLogin ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowPinLogin(true)}
+                    className="w-full py-3 px-4 rounded-2xl bg-slate-800/80 hover:bg-slate-800 text-sky-400 font-bold text-xs border border-sky-500/30 flex items-center justify-center gap-2 min-h-[44px]"
+                  >
+                    <KeyRound className="w-4 h-4" />
+                    <span>Entrar com PIN Rápido deste Aparelho</span>
+                  </button>
+                ) : (
+                  <form onSubmit={handleQuickPinLogin} className="p-3 rounded-2xl bg-slate-950 border border-sky-500/30 flex gap-2">
+                    <input
+                      type="password"
+                      inputMode="numeric"
+                      maxLength={6}
+                      value={quickPinInput}
+                      onChange={(e) => setQuickPinInput(e.target.value.replace(/\D/g, ''))}
+                      placeholder="Digite seu PIN"
+                      autoFocus
+                      className="flex-1 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-center font-mono text-base font-black text-white tracking-widest focus:outline-none focus:border-sky-500"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs"
+                    >
+                      Entrar
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -286,25 +380,65 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           </button>
         </form>
 
-        {/* Register Biometrics section */}
-        {supportsBiometrics && (
-          <div className="mt-6 pt-4 border-t border-slate-800 text-center">
-            <button
-              type="button"
-              disabled={isRegisteringBiometrics}
-              onClick={handleRegisterBiometrics}
-              className="text-xs font-bold text-sky-400 hover:text-sky-300 flex items-center justify-center gap-1.5 mx-auto transition-colors"
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>
-                {hasPasskey
-                  ? 'Recadastrar / Atualizar Chave de Acesso Biométrica'
-                  : 'Cadastrar Biometria neste Dispositivo (Chave de Acesso)'}
-              </span>
-            </button>
-            <span className="text-[10px] text-slate-500 block mt-1">
-              Permite fazer login instantâneo sem digitar senha nas próximas vezes
-            </span>
+        {/* Register Biometrics / Quick PIN section */}
+        {(supportsBiometrics || showPinSetup) && (
+          <div className="mt-6 pt-4 border-t border-slate-800 text-center space-y-2.5">
+            {supportsBiometrics && (
+              <>
+                <button
+                  type="button"
+                  disabled={isRegisteringBiometrics}
+                  onClick={handleRegisterBiometrics}
+                  className="text-xs font-bold text-sky-400 hover:text-sky-300 flex items-center justify-center gap-1.5 mx-auto transition-colors py-1"
+                >
+                  <KeyRound className="w-3.5 h-3.5" />
+                  <span>
+                    {hasPasskey
+                      ? 'Recadastrar / Atualizar Chave de Acesso Biométrica'
+                      : 'Cadastrar Biometria neste Dispositivo (Chave de Acesso)'}
+                  </span>
+                </button>
+                <span className="text-[10px] text-slate-500 block">
+                  Permite fazer login instantâneo sem digitar senha nas próximas vezes
+                </span>
+              </>
+            )}
+
+            {!showPinSetup ? (
+              <button
+                type="button"
+                onClick={() => setShowPinSetup(true)}
+                className="text-[11px] font-semibold text-slate-400 hover:text-emerald-400 underline block mx-auto"
+              >
+                {hasQuickPin ? 'Alterar PIN Rápido' : 'Ou cadastrar PIN Rápido (4 dígitos)'}
+              </button>
+            ) : (
+              <form
+                onSubmit={handleRegisterQuickPin}
+                className="p-3 rounded-2xl bg-slate-950 border border-sky-500/30 space-y-2 text-left mt-2"
+              >
+                <span className="text-[10px] font-bold text-sky-400 uppercase tracking-wider block">
+                  Definir PIN Rápido (4 a 6 dígitos)
+                </span>
+                <div className="flex gap-2">
+                  <input
+                    type="password"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={quickPinInput}
+                    onChange={(e) => setQuickPinInput(e.target.value.replace(/\D/g, ''))}
+                    placeholder="Ex: 1234"
+                    className="flex-1 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-center font-mono text-base font-black text-white tracking-widest focus:outline-none focus:border-sky-500"
+                  />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs"
+                  >
+                    Salvar PIN
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         )}
       </div>
